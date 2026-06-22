@@ -1,0 +1,2528 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>VOCA BAAAAM! v12 Firestore</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap');
+:root{--gold:#ffd166;--mint:#85ffe8;--cyan:#39e7ff;--red:#ff4054;--purple:#2b1039;--safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#05020b;color:#fff;font-family:Nunito,system-ui,sans-serif;user-select:none}button,input{font-family:inherit}#app{position:relative;width:100vw;height:100dvh;overflow:hidden;background:#090414}canvas{position:absolute;inset:0;width:100%;height:100%;display:block}.screen{position:absolute;inset:0;z-index:40;display:none;align-items:center;justify-content:center;padding:calc(18px + var(--safe-top)) 18px calc(18px + var(--safe-bottom));background:rgba(5,2,11,.76);backdrop-filter:blur(7px)}.screen.active{display:flex}.card{width:min(420px,94vw);border:1px solid rgba(255,255,255,.18);border-radius:30px;background:linear-gradient(180deg,rgba(48,19,70,.96),rgba(14,7,25,.98));box-shadow:0 30px 100px rgba(0,0,0,.68),inset 0 0 50px rgba(255,255,255,.04);text-align:center;padding:28px 22px}.badge{display:inline-flex;font-size:13px;color:#dfffee;border:1px solid rgba(255,255,255,.16);border-radius:999px;background:rgba(255,255,255,.08);padding:8px 13px;margin-bottom:14px}h1{font-size:clamp(44px,15vw,72px);line-height:.82;margin:8px 0 12px;letter-spacing:-2px;text-shadow:0 0 22px rgba(255,64,84,.58),0 7px 0 rgba(0,0,0,.35)}h1 span{color:var(--gold);text-shadow:0 0 24px rgba(255,209,102,.75)}.subtitle{margin:0 auto 22px;color:#f3e8ff;font-size:16px;line-height:1.4;max-width:340px}.btn-main,.btn-sub{border:0;width:100%;font-weight:900;cursor:pointer}.btn-main{font-size:22px;padding:18px 22px;border-radius:21px;color:#160817;background:linear-gradient(180deg,#fff0a5,#ffb627);box-shadow:0 9px 0 #9b5700,0 0 36px rgba(255,209,102,.55)}.btn-main:active{transform:translateY(5px);box-shadow:0 4px 0 #9b5700,0 0 26px rgba(255,209,102,.45)}.btn-sub{margin-top:12px;font-size:17px;padding:15px;border-radius:18px;color:#fff;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15)}.steps{display:grid;gap:9px;margin:18px 0 0;text-align:left}.step{display:flex;gap:10px;align-items:flex-start;padding:12px;border-radius:17px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1)}.step b{color:var(--mint);font-size:15px;white-space:nowrap}.step span{color:#eee0f6;font-size:14px;line-height:1.32}#hud{position:absolute;inset:0;z-index:30;display:none;pointer-events:none}#hud.active{display:block}.topbar{position:absolute;top:calc(10px + var(--safe-top));left:10px;right:10px;display:flex;gap:8px;justify-content:space-between;align-items:flex-start}.pill{background:rgba(11,7,20,.73);border:1px solid rgba(255,255,255,.16);border-radius:18px;padding:10px 12px;backdrop-filter:blur(10px);box-shadow:0 10px 26px rgba(0,0,0,.25)}.pill small{display:block;color:#baffdf;font-size:10px;letter-spacing:1px;opacity:.9}.pill strong{font-size:17px}.phase{color:var(--gold)}#targetBox{position:absolute;left:50%;bottom:calc(12px + var(--safe-bottom));transform:translateX(-50%);width:min(410px,94vw);pointer-events:auto}#goalText{text-align:center;color:#ffe9a6;font-size:15px;margin-bottom:8px;text-shadow:0 0 12px rgba(255,209,102,.45);min-height:22px}#wordInput{width:100%;border:2px solid rgba(255,255,255,.2);outline:none;border-radius:24px;background:rgba(255,255,255,.97);color:#1d1029;text-align:center;font-size:27px;font-weight:900;padding:16px 18px;box-shadow:0 10px 0 rgba(0,0,0,.28),0 0 32px rgba(255,64,84,.2);text-transform:lowercase}#wordInput:focus{border-color:var(--gold);box-shadow:0 10px 0 rgba(0,0,0,.28),0 0 42px rgba(255,209,102,.5)}#wordInput:disabled{opacity:1;color:#1d1029}#wordInput.wrong{animation:wrong .22s;background:#ffe2e7}@keyframes wrong{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}#shootBtn{width:100%;margin-top:10px;border:0;border-radius:20px;padding:14px 18px;font-size:20px;font-weight:900;color:#190713;background:linear-gradient(180deg,#9fffe1,#3ce2ff);box-shadow:0 7px 0 #11738a,0 0 26px rgba(60,226,255,.38);cursor:pointer}#shootBtn:active{transform:translateY(4px);box-shadow:0 3px 0 #11738a,0 0 20px rgba(60,226,255,.32)}#shootBtn:disabled{filter:saturate(.55);opacity:.9}.word-list{list-style:none;padding:0;margin:18px 0 22px;display:grid;gap:8px;max-height:42dvh;overflow:auto}.word-list li{display:flex;justify-content:space-between;gap:10px;align-items:center;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.09);border-radius:16px;padding:12px 14px;text-align:left}.word-list b{color:var(--mint);letter-spacing:1px}.word-list em{font-style:normal;color:#ffe9a6}.modal-title{font-size:36px;line-height:.95;margin:6px 0 10px;color:var(--gold);text-shadow:0 0 18px rgba(255,209,102,.55)}.modal-desc{margin:0;color:#eadff2;font-size:16px;line-height:1.38}.flash{position:absolute;inset:0;z-index:25;background:rgba(255,255,255,.38);opacity:0;pointer-events:none}.flash.on{animation:flash .23s}@keyframes flash{0%{opacity:0}35%{opacity:1}100%{opacity:0}}.tiny{font-size:12px;color:#d8c7e8;margin-top:12px;opacity:.82}
+.btn-main:disabled{filter:grayscale(.55);opacity:.55;box-shadow:none;transform:none;cursor:default}.collect-layout{display:grid;gap:14px;margin:18px 0}.reward-zone,.vault-zone{border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.07);border-radius:22px;padding:13px}.zone-title{font-size:13px;color:#baffdf;letter-spacing:1px;text-align:left;margin:0 0 9px}.reward-chips,.vault-box{display:flex;gap:9px;flex-wrap:wrap;align-items:center;justify-content:center;min-height:58px}.vault-box{border:1px dashed rgba(255,209,102,.45);border-radius:17px;background:rgba(255,209,102,.07);padding:10px}.empty-vault{font-size:14px;color:#f3e8ff;opacity:.72}.word-chip{border:0;border-radius:999px;padding:12px 15px;font-size:17px;font-weight:900;color:#220817;background:linear-gradient(180deg,#fff7c4,#ffd166);box-shadow:0 5px 0 #9b5700,0 0 18px rgba(255,209,102,.32);cursor:pointer}.word-chip:active{transform:translateY(3px);box-shadow:0 2px 0 #9b5700}.word-chip.moved{background:rgba(255,255,255,.12);color:#d9cce8;box-shadow:none;border:1px solid rgba(255,255,255,.14);cursor:default}.word-chip.saved{background:linear-gradient(180deg,#baffdf,#39e7ff);box-shadow:0 5px 0 #11738a;color:#071820}.word-list li.clickable{cursor:pointer}.word-list li.clickable:active{transform:scale(.985);background:rgba(255,209,102,.12)}.profile-form{display:grid;gap:10px;margin:16px 0 12px}.profile-input{width:100%;border:2px solid rgba(255,255,255,.14);outline:none;border-radius:17px;background:rgba(255,255,255,.94);color:#1d1029;font-size:18px;font-weight:900;padding:13px 15px;text-align:center}.profile-input:focus{border-color:var(--gold);box-shadow:0 0 22px rgba(255,209,102,.35)}.save-info{min-height:22px;font-size:13px;color:#baffdf;margin:6px 0 12px;line-height:1.35}.save-info.warn{color:#ffe9a6}.save-info.bad{color:#ffbdc4}.btn-mini{margin-top:10px;border:0;background:transparent;color:#d8c7e8;text-decoration:underline;font-size:13px;font-weight:800;cursor:pointer}.btn-mini:disabled{opacity:.35;cursor:default}.player-tag{position:absolute;top:calc(64px + var(--safe-top));left:10px;right:10px;text-align:left;color:#e9d9ff;font-size:12px;opacity:.88;pointer-events:none}.player-tag b{color:#baffdf}
+.icon-btn{position:absolute;top:calc(76px + var(--safe-top));z-index:80;border:1px solid rgba(255,255,255,.18);background:rgba(11,7,20,.72);color:#fff;border-radius:999px;width:42px;height:42px;font-size:19px;font-weight:900;backdrop-filter:blur(10px);box-shadow:0 8px 24px rgba(0,0,0,.28);cursor:pointer}.icon-btn:active{transform:scale(.94)}.sound-btn{right:12px}.back-btn{left:12px;display:none}.back-btn.show{display:block}
+@media (min-width:700px){#app{width:430px;height:100dvh;margin:0 auto;box-shadow:0 0 0 999px #05020b}body{background:#05020b}}
+</style>
+</head>
+<body>
+<div id="app">
+  <canvas id="bg"></canvas>
+  <canvas id="game"></canvas>
+  <div class="flash" id="flash"></div>
+  <button class="icon-btn sound-btn" id="soundBtn" aria-label="sound">🔊</button>
+  <button class="icon-btn back-btn" id="backBtn" aria-label="back">←</button>
+
+  <section class="screen active" id="home">
+    <div class="card">
+      <div class="badge">✨ 영어의 자유 Mobile Arcade</div>
+      <h1>VOCA<br><span>BAAAAM!</span></h1>
+      <div class="profile-form">
+        <input class="profile-input" id="academyCode" placeholder="학원코드" autocomplete="off" />
+        <input class="profile-input" id="playerName" placeholder="학생이름" autocomplete="name" />
+        <input class="profile-input" id="playerPin" placeholder="비밀번호 4자리" inputmode="numeric" maxlength="4" autocomplete="off" />
+      </div>
+      <div class="save-info warn" id="saveInfo" style="display:none"></div>
+      <button class="btn-main" id="startBtn">START GAME</button>
+      <button class="btn-mini" id="resetSaveBtn" disabled style="display:none"></button>
+    </div>
+  </section>
+
+  <div id="hud">
+    <div class="topbar">
+      <div class="pill"><small>LEVEL</small><strong id="levelText">1</strong> · <strong class="phase" id="phaseText">SPELL</strong></div>
+      <div class="pill"><small>WORD</small><strong id="countText">1/1</strong></div>
+      <div class="player-tag" id="playerTag"></div>
+    </div>
+    <div id="targetBox">
+      <div id="goalText">단어를 입력하고 Enter로 화살 발사!</div>
+      <input id="wordInput" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="type + enter" />
+      <button id="shootBtn">🏹 SHOOT / ENTER</button>
+    </div>
+  </div>
+
+
+  <section class="screen" id="collectScreen">
+    <div class="card">
+      <h2 class="modal-title" id="collectTitle">단어 획득!</h2>
+      <p class="modal-desc" id="collectDesc">성공한 단어를 눌러 내 보관함에 넣으세요. 누를 때마다 발음이 나옵니다.</p>
+      <div class="collect-layout">
+        <div class="reward-zone">
+          <p class="zone-title">SUCCESS WORDS</p>
+          <div class="reward-chips" id="rewardWords"></div>
+        </div>
+        <div class="vault-zone">
+          <p class="zone-title">MY WORD BOX</p>
+          <div class="vault-box" id="vaultBox"><span class="empty-vault">단어를 클릭해서 보관함으로 옮기기</span></div>
+        </div>
+      </div>
+      <button class="btn-main" id="collectNextBtn" disabled>단어를 모두 보관하세요</button>
+    </div>
+  </section>
+
+  <section class="screen" id="studyScreen">
+    <div class="card">
+      <h2 class="modal-title">WORD STUDY</h2>
+      <p class="modal-desc">이번 레벨 단어를 확인하세요. 다음에는 철자가 섞여서 나옵니다.</p>
+      <ul class="word-list" id="studyList"></ul>
+      <button class="btn-main" id="anagramBtn">ANAGRAM 도전</button>
+    </div>
+  </section>
+
+  <section class="screen" id="clearScreen">
+    <div class="card">
+      <h2 class="modal-title" id="clearTitle">LEVEL CLEAR!</h2>
+      <p class="modal-desc" id="clearDesc">좋아요! 다음 레벨은 단어가 하나 더 늘어납니다.</p>
+      <ul class="word-list" id="clearList"></ul>
+      <button class="btn-main" id="nextBtn">NEXT LEVEL</button>
+    </div>
+  </section>
+
+  <section class="screen" id="overScreen">
+    <div class="card">
+      <h2 class="modal-title">GAME OVER</h2>
+      <p class="modal-desc">뱀이 전사에게 너무 가까이 왔어요. 같은 단계에서 다시 도전!</p>
+      <button class="btn-main" id="retryBtn">RETRY</button>
+      <button class="btn-sub" id="homeBtn">HOME</button>
+    </div>
+  </section>
+</div>
+<script src="https://www.gstatic.com/firebasejs/12.7.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore-compat.js"></script>
+<script>
+(()=>{
+'use strict';
+const app=document.getElementById('app');
+const bg=document.getElementById('bg');
+const game=document.getElementById('game');
+const b=bg.getContext('2d');
+const c=game.getContext('2d');
+const screens={home:document.getElementById('home'),collect:document.getElementById('collectScreen'),study:document.getElementById('studyScreen'),clear:document.getElementById('clearScreen'),over:document.getElementById('overScreen')};
+const hud=document.getElementById('hud');
+const input=document.getElementById('wordInput');
+const shootBtn=document.getElementById('shootBtn');
+const goalText=document.getElementById('goalText');
+const levelText=document.getElementById('levelText');
+const phaseText=document.getElementById('phaseText');
+const countText=document.getElementById('countText');
+const flash=document.getElementById('flash');
+const academyCodeInput=document.getElementById('academyCode');
+const playerNameInput=document.getElementById('playerName');
+const playerPinInput=document.getElementById('playerPin');
+const saveInfo=document.getElementById('saveInfo');
+const resetSaveBtn=document.getElementById('resetSaveBtn');
+const startBtn=document.getElementById('startBtn');
+const playerTag=document.getElementById('playerTag');
+const soundBtn=document.getElementById('soundBtn');
+const backBtn=document.getElementById('backBtn');
+
+// Firebase / Firestore 설정
+// 같은 HTML 파일을 브라우저에서 바로 열어도 동작하도록 compat CDN 방식을 사용합니다.
+const firebaseConfig = {
+  apiKey: "AIzaSyAhiPVipngoBwYiBXxCky9pKZAFB3D8ZPA",
+  authDomain: "voca-baaaam.firebaseapp.com",
+  projectId: "voca-baaaam",
+  storageBucket: "voca-baaaam.firebasestorage.app",
+  messagingSenderId: "223880133423",
+  appId: "1:223880133423:web:16b5215f17c0bbad9fbfda"
+};
+
+let db = null;
+let firestoreReady = false;
+
+function initFirestore(){
+  try{
+    if(!window.firebase || !firebase.firestore){
+      console.warn('Firebase SDK가 아직 로드되지 않았습니다. 로컬 저장만 사용합니다.');
+      return;
+    }
+    const app = firebase.apps && firebase.apps.length ? firebase.app() : firebase.initializeApp(firebaseConfig);
+    db = firebase.firestore(app);
+    firestoreReady = true;
+    console.log('Firestore 연결 준비 완료');
+  }catch(err){
+    firestoreReady = false;
+    console.warn('Firestore 초기화 실패. 로컬 저장만 사용합니다.', err);
+  }
+}
+initFirestore();
+
+
+if(!CanvasRenderingContext2D.prototype.roundRect){
+  CanvasRenderingContext2D.prototype.roundRect=function(x,y,w,h,r){r=Math.min(r,w/2,h/2);this.beginPath();this.moveTo(x+r,y);this.arcTo(x+w,y,x+w,y+h,r);this.arcTo(x+w,y+h,x,y+h,r);this.arcTo(x,y+h,x,y,r);this.arcTo(x,y,x+w,y,r);this.closePath();return this;};
+}
+
+const wordPool = [
+{word:'apple',mean:'사과'},
+  {word:'grape',mean:'포도'},
+  {word:'bank',mean:'은행'},
+  {word:'water',mean:'물'},
+  {word:'magic',mean:'마법'},
+  {word:'forest',mean:'숲'},
+  {word:'light',mean:'빛'},
+  {word:'brave',mean:'용감한'},
+  {word:'dream',mean:'꿈'},
+  {word:'happy',mean:'행복한'},
+  {word:'smile',mean:'미소'},
+  {word:'world',mean:'세계'},
+  {word:'peace',mean:'평화'},
+  {word:'smart',mean:'똑똑한'},
+  {word:'giant',mean:'거인'},
+  {word:'ocean',mean:'바다'},
+  {word:'river',mean:'강'},
+  {word:'cloud',mean:'구름'},
+  {word:'stone',mean:'돌'},
+  {word:'plant',mean:'식물'},
+  {word:'heart',mean:'마음'},
+  {word:'chair',mean:'의자'},
+  {word:'table',mean:'탁자'},
+  {word:'pencil',mean:'연필'},
+  {word:'school',mean:'학교'},
+  {word:'friend',mean:'친구'},
+  {word:'family',mean:'가족'},
+  {word:'animal',mean:'동물'},
+  {word:'tiger',mean:'호랑이'},
+  {word:'rabbit',mean:'토끼'},
+  {word:'monkey',mean:'원숭이'},
+  {word:'yellow',mean:'노란색'},
+  {word:'purple',mean:'보라색'},
+  {word:'orange',mean:'주황색'},
+  {word:'silver',mean:'은색'},
+  {word:'gold',mean:'금색'},
+  {word:'bread',mean:'빵'},
+  {word:'cheese',mean:'치즈'},
+  {word:'honey',mean:'꿀'},
+  {word:'juice',mean:'주스'},
+  {word:'lemon',mean:'레몬'},
+  {word:'melon',mean:'멜론'},
+  {word:'berry',mean:'베리'},
+  {word:'candy',mean:'사탕'},
+  {word:'cookie',mean:'쿠키'},
+  {word:'house',mean:'집'},
+  {word:'garden',mean:'정원'},
+  {word:'window',mean:'창문'},
+  {word:'mirror',mean:'거울'},
+  {word:'basket',mean:'바구니'},
+  {word:'bottle',mean:'병'},
+  {word:'blanket',mean:'담요'},
+  {word:'pillow',mean:'베개'},
+  {word:'towel',mean:'수건'},
+  {word:'clock',mean:'시계'},
+  {word:'morning',mean:'아침'},
+  {word:'evening',mean:'저녁'},
+  {word:'season',mean:'계절'},
+  {word:'winter',mean:'겨울'},
+  {word:'spring',mean:'봄'},
+  {word:'summer',mean:'여름'},
+  {word:'autumn',mean:'가을'},
+  {word:'weather',mean:'날씨'},
+  {word:'rainbow',mean:'무지개'},
+  {word:'shadow',mean:'그림자'},
+  {word:'sunshine',mean:'햇빛'},
+  {word:'teacher',mean:'선생님'},
+  {word:'student',mean:'학생'},
+  {word:'lesson',mean:'수업'},
+  {word:'answer',mean:'대답'},
+  {word:'question',mean:'질문'},
+  {word:'story',mean:'이야기'},
+  {word:'letter',mean:'글자'},
+  {word:'number',mean:'숫자'},
+  {word:'picture',mean:'그림'},
+  {word:'music',mean:'음악'},
+  {word:'movie',mean:'영화'},
+  {word:'game',mean:'게임'},
+  {word:'jump',mean:'뛰다'},
+  {word:'dance',mean:'춤추다'},
+  {word:'laugh',mean:'웃다'},
+  {word:'listen',mean:'듣다'},
+  {word:'speak',mean:'말하다'},
+  {word:'write',mean:'쓰다'},
+  {word:'read',mean:'읽다'},
+  {word:'think',mean:'생각하다'},
+  {word:'learn',mean:'배우다'},
+  {word:'study',mean:'공부하다'},
+  {word:'practice',mean:'연습하다'},
+  {word:'remember',mean:'기억하다'},
+  {word:'forget',mean:'잊다'},
+  {word:'clean',mean:'깨끗한'},
+  {word:'dirty',mean:'더러운'},
+  {word:'quiet',mean:'조용한'},
+  {word:'noisy',mean:'시끄러운'},
+  {word:'early',mean:'이른'},
+  {word:'late',mean:'늦은'},
+  {word:'quick',mean:'빠른'},
+  {word:'slow',mean:'느린'},
+  {word:'strong',mean:'강한'},
+  {word:'weak',mean:'약한'},
+  {word:'kind',mean:'친절한'},
+  {word:'funny',mean:'재미있는'},
+  {word:'pretty',mean:'예쁜'},
+  {word:'careful',mean:'조심하는'},
+  {word:'special',mean:'특별한'},
+  {word:'market',mean:'시장'},
+  {word:'bakery',mean:'빵집'},
+  {word:'library',mean:'도서관'},
+  {word:'museum',mean:'박물관'},
+  {word:'station',mean:'역'},
+  {word:'airport',mean:'공항'},
+  {word:'village',mean:'마을'},
+  {word:'city',mean:'도시'},
+  {word:'country',mean:'나라'},
+  {word:'island',mean:'섬'},
+  {word:'mountain',mean:'산'},
+  {word:'valley',mean:'계곡'},
+  {word:'desert',mean:'사막'},
+  {word:'jungle',mean:'정글'},
+  {word:'castle',mean:'성'},
+  {word:'temple',mean:'사원'},
+  {word:'doctor',mean:'의사'},
+  {word:'nurse',mean:'간호사'},
+  {word:'farmer',mean:'농부'},
+  {word:'driver',mean:'운전사'},
+  {word:'singer',mean:'가수'},
+  {word:'painter',mean:'화가'},
+  {word:'writer',mean:'작가'},
+  {word:'actor',mean:'배우'},
+  {word:'pilot',mean:'조종사'},
+  {word:'police',mean:'경찰'},
+  {word:'chef',mean:'요리사'},
+  {word:'clerk',mean:'점원'},
+  {word:'rocket',mean:'로켓'},
+  {word:'planet',mean:'행성'},
+  {word:'star',mean:'별'},
+  {word:'space',mean:'우주'},
+  {word:'earth',mean:'지구'},
+  {word:'moon',mean:'달'},
+  {word:'solar',mean:'태양의'},
+  {word:'comet',mean:'혜성'},
+  {word:'galaxy',mean:'은하'},
+  {word:'universe',mean:'우주'},
+  {word:'helmet',mean:'헬멧'},
+  {word:'jacket',mean:'재킷'},
+  {word:'pocket',mean:'주머니'},
+  {word:'gloves',mean:'장갑'},
+  {word:'button',mean:'단추'},
+  {word:'ribbon',mean:'리본'},
+  {word:'shoes',mean:'신발'},
+  {word:'socks',mean:'양말'},
+  {word:'scarf',mean:'목도리'},
+  {word:'uniform',mean:'교복'},
+  {word:'soccer',mean:'축구'},
+  {word:'tennis',mean:'테니스'},
+  {word:'basketball',mean:'농구'},
+  {word:'baseball',mean:'야구'},
+  {word:'swimming',mean:'수영'},
+  {word:'running',mean:'달리기'},
+  {word:'winner',mean:'승자'},
+  {word:'score',mean:'점수'},
+  {word:'team',mean:'팀'},
+  {word:'coach',mean:'코치'},
+  {word:'match',mean:'경기'},
+  {word:'race',mean:'경주'},
+  {word:'travel',mean:'여행하다'},
+  {word:'arrive',mean:'도착하다'},
+  {word:'leave',mean:'떠나다'},
+  {word:'visit',mean:'방문하다'},
+  {word:'carry',mean:'나르다'},
+  {word:'follow',mean:'따라가다'},
+  {word:'choose',mean:'고르다'},
+  {word:'build',mean:'짓다'},
+  {word:'break',mean:'부수다'},
+  {word:'catch',mean:'잡다'},
+  {word:'throw',mean:'던지다'},
+  {word:'push',mean:'밀다'},
+  {word:'pull',mean:'당기다'},
+  {word:'climb',mean:'오르다'},
+  {word:'cross',mean:'건너다'},
+  {word:'above',mean:'위에'},
+  {word:'below',mean:'아래에'},
+  {word:'inside',mean:'안에'},
+  {word:'outside',mean:'밖에'},
+  {word:'between',mean:'사이에'},
+  {word:'behind',mean:'뒤에'},
+  {word:'beside',mean:'옆에'},
+  {word:'around',mean:'주위에'},
+  {word:'through',mean:'통과하여'},
+  {word:'toward',mean:'향하여'},
+  {word:'reason',mean:'이유'},
+  {word:'result',mean:'결과'},
+  {word:'problem',mean:'문제'},
+  {word:'solution',mean:'해결책'},
+  {word:'example',mean:'예시'},
+  {word:'change',mean:'변화'},
+  {word:'chance',mean:'기회'},
+  {word:'choice',mean:'선택'},
+  {word:'habit',mean:'습관'},
+  {word:'promise',mean:'약속'},
+  {word:'secret',mean:'비밀'},
+  {word:'treasure',mean:'보물'},
+  {word:'adventure',mean:'모험'},
+  {word:'journey',mean:'여정'},
+  {word:'memory',mean:'기억'},
+  {word:'energy',mean:'에너지'},
+  {word:'nature',mean:'자연'},
+  {word:'science',mean:'과학'},
+  {word:'history',mean:'역사'},
+  {word:'culture',mean:'문화'},
+  {word:'language',mean:'언어'},
+  {word:'grammar',mean:'문법'},
+  {word:'sentence',mean:'문장'},
+  {word:'meaning',mean:'뜻'},
+  {word:'sound',mean:'소리'},
+  {word:'voice',mean:'목소리'},
+  {word:'mail',mean:'우편'},
+  {word:'spelling',mean:'철자'},
+  {word:'vocabulary',mean:'어휘'},
+  {word:'north',mean:'북쪽'},
+  {word:'south',mean:'남쪽'},
+  {word:'east',mean:'동쪽'},
+  {word:'west',mean:'서쪽'},
+  {word:'center',mean:'중심'},
+  {word:'corner',mean:'모서리'},
+  {word:'circle',mean:'원'},
+  {word:'square',mean:'정사각형'},
+  {word:'triangle',mean:'삼각형'},
+  {word:'line',mean:'선'},
+  {word:'point',mean:'점'},
+  {word:'shape',mean:'모양'},
+  {word:'pattern',mean:'무늬'},
+  {word:'size',mean:'크기'},
+  {word:'healthy',mean:'건강한'},
+  {word:'hungry',mean:'배고픈'},
+  {word:'thirsty',mean:'목마른'},
+  {word:'sleepy',mean:'졸린'},
+  {word:'angry',mean:'화난'},
+  {word:'worried',mean:'걱정하는'},
+  {word:'excited',mean:'신난'},
+  {word:'lonely',mean:'외로운'},
+  {word:'proud',mean:'자랑스러운'},
+  {word:'safe',mean:'안전한'},
+  {word:'dangerous',mean:'위험한'},
+  {word:'gentle',mean:'부드러운'},
+  {word:'honest',mean:'정직한'},
+  {word:'patient',mean:'참을성있는'},
+  {word:'curious',mean:'호기심많은'},
+  {word:'captain',mean:'대장'},
+  {word:'soldier',mean:'군인'},
+  {word:'warrior',mean:'전사'},
+  {word:'hunter',mean:'사냥꾼'},
+  {word:'wizard',mean:'마법사'},
+  {word:'dragon',mean:'용'},
+  {word:'monster',mean:'괴물'},
+  {word:'fairy',mean:'요정'},
+  {word:'ghost',mean:'유령'},
+  {word:'queen',mean:'여왕'},
+  {word:'king',mean:'왕'},
+  {word:'prince',mean:'왕자'},
+  {word:'princess',mean:'공주'},
+  {word:'knight',mean:'기사'},
+  {word:'hero',mean:'영웅'},
+  {word:'woods',mean:'숲'},
+  {word:'branch',mean:'나뭇가지'},
+  {word:'flower',mean:'꽃'},
+  {word:'grass',mean:'풀'},
+  {word:'leaf',mean:'잎'},
+  {word:'root',mean:'뿌리'},
+  {word:'seed',mean:'씨앗'},
+  {word:'fruit',mean:'과일'},
+  {word:'insect',mean:'곤충'},
+  {word:'butterfly',mean:'나비'},
+  {word:'spider',mean:'거미'},
+  {word:'beetle',mean:'딱정벌레'},
+  {word:'eagle',mean:'독수리'},
+  {word:'whale',mean:'고래'},
+  {word:'dolphin',mean:'돌고래'},
+  {word:'shark',mean:'상어'},
+  {word:'turtle',mean:'거북'},
+  {word:'penguin',mean:'펭귄'},
+  {word:'machine',mean:'기계'},
+  {word:'engine',mean:'엔진'},
+  {word:'switch',mean:'스위치'},
+  {word:'screen',mean:'화면'},
+  {word:'keyboard',mean:'키보드'},
+  {word:'camera',mean:'카메라'},
+  {word:'battery',mean:'배터리'},
+  {word:'robot',mean:'로봇'},
+  {word:'signal',mean:'신호'},
+  {word:'network',mean:'네트워크'},
+  {word:'message',mean:'메시지'},
+  {word:'device',mean:'장치'},
+  {word:'accept',mean:'받아들이다'},
+  {word:'agree',mean:'동의하다'},
+  {word:'allow',mean:'허락하다'},
+  {word:'borrow',mean:'빌리다'},
+  {word:'believe',mean:'믿다'},
+  {word:'collect',mean:'모으다'},
+  {word:'compare',mean:'비교하다'},
+  {word:'connect',mean:'연결하다'},
+  {word:'continue',mean:'계속하다'},
+  {word:'create',mean:'창조하다'},
+  {word:'decide',mean:'결정하다'},
+  {word:'describe',mean:'묘사하다'},
+  {word:'develop',mean:'발전시키다'},
+  {word:'discover',mean:'발견하다'},
+  {word:'explain',mean:'설명하다'},
+  {word:'protect',mean:'보호하다'},
+  {word:'prepare',mean:'준비하다'},
+  {word:'improve',mean:'향상시키다'},
+  {word:'include',mean:'포함하다'},
+  {word:'increase',mean:'증가하다'},
+  {word:'invite',mean:'초대하다'},
+  {word:'notice',mean:'알아차리다'},
+  {word:'offer',mean:'제공하다'},
+  {word:'order',mean:'주문하다'},
+  {word:'return',mean:'돌아오다'},
+  {word:'share',mean:'나누다'},
+  {word:'support',mean:'지지하다'},
+  {word:'suppose',mean:'추측하다'},
+  {word:'suggest',mean:'제안하다'},
+  {word:'understand',mean:'이해하다'},
+  {word:'ability',mean:'능력'}, 
+  {word:'absent',mean:'결석한'},
+  {word:'action',mean:'행동'},
+  {word:'active',mean:'활동적인'},
+  {word:'address',mean:'주소'},
+  {word:'adult',mean:'어른'},
+  {word:'advice',mean:'조언'},
+  {word:'afraid',mean:'두려워하는'},
+  {word:'against',mean:'반대하여'},
+  {word:'alarm',mean:'알람'},
+  {word:'alive',mean:'살아있는'},
+  {word:'alone',mean:'혼자인'},
+  {word:'amazing',mean:'놀라운'},
+  {word:'among',mean:'~사이에'},
+  {word:'ancient',mean:'고대의'},
+  {word:'angle',mean:'각도'},
+  {word:'area',mean:'지역'},
+  {word:'argue',mean:'논쟁하다'},
+  {word:'army',mean:'군대'},
+  {word:'asleep',mean:'잠든'},
+  {word:'attack',mean:'공격하다'},
+  {word:'avoid',mean:'피하다'},
+  {word:'awake',mean:'깨어있는'},
+  {word:'balance',mean:'균형'},
+  {word:'battle',mean:'전투'},
+  {word:'beauty',mean:'아름다움'},
+  {word:'because',mean:'왜냐하면'},
+  {word:'become',mean:'~이 되다'},
+  {word:'before',mean:'~전에'},
+  {word:'belong',mean:'속하다'},
+  {word:'beyond',mean:'~너머에'},
+  {word:'bitter',mean:'쓴'},
+  {word:'board',mean:'판자'},
+  {word:'border',mean:'경계'},
+  {word:'bottom',mean:'바닥'},
+  {word:'brain',mean:'뇌'},
+  {word:'bridge',mean:'다리'},
+  {word:'bright',mean:'밝은'},
+  {word:'broken',mean:'부서진'},
+  {word:'brush',mean:'솔'},
+  {word:'bubble',mean:'거품'},
+  {word:'cabbage',mean:'양배추'},
+  {word:'candle',mean:'양초'},
+  {word:'carpet',mean:'카펫'},
+  {word:'ceiling',mean:'천장'},
+  {word:'certain',mean:'확실한'},
+  {word:'circle',mean:'원'},
+  {word:'clever',mean:'영리한'},
+  {word:'closet',mean:'옷장'},
+  {word:'college',mean:'대학'},
+  {word:'common',mean:'흔한'},
+  {word:'complete',mean:'완성하다'},
+  {word:'condition',mean:'상태'},
+  {word:'control',mean:'통제하다'},
+  {word:'correct',mean:'올바른'},
+  {word:'couple',mean:'한 쌍'},
+  {word:'courage',mean:'용기'},
+  {word:'damage',mean:'손상'},
+  {word:'danger',mean:'위험'},
+  {word:'decision',mean:'결정'},
+  {word:'degree',mean:'정도'},
+  {word:'delicious',mean:'맛있는'},
+  {word:'dentist',mean:'치과의사'},
+  {word:'different',mean:'다른'},
+  {word:'difficult',mean:'어려운'},
+  {word:'direction',mean:'방향'},
+  {word:'divide',mean:'나누다'},
+  {word:'double',mean:'두 배의'},
+  {word:'drawer',mean:'서랍'},
+  {word:'effect',mean:'영향'},
+  {word:'effort',mean:'노력'},
+  {word:'either',mean:'둘 중 하나'},
+  {word:'empty',mean:'빈'},
+  {word:'enough',mean:'충분한'},
+  {word:'escape',mean:'탈출하다'},
+  {word:'event',mean:'사건'},
+  {word:'excellent',mean:'훌륭한'},
+  {word:'factory',mean:'공장'},
+  {word:'famous',mean:'유명한'},
+  {word:'favorite',mean:'가장 좋아하는'},
+  {word:'feather',mean:'깃털'},
+  {word:'female',mean:'여성의'},
+  {word:'fence',mean:'울타리'},
+  {word:'final',mean:'마지막의'},
+  {word:'finger',mean:'손가락'},
+  {word:'flight',mean:'비행'},
+  {word:'follow',mean:'따라가다'},
+  {word:'forward',mean:'앞으로'},
+  {word:'freedom',mean:'자유'},
+  {word:'fresh',mean:'신선한'},
+  {word:'future',mean:'미래'},
+  {word:'gentleman',mean:'신사'},
+  {word:'gesture',mean:'몸짓'},
+  {word:'giraffe',mean:'기린'},
+  {word:'global',mean:'세계적인'},
+  {word:'golden',mean:'금빛의'},
+  {word:'grand',mean:'웅장한'},
+  {word:'growth',mean:'성장'},
+  {word:'handle',mean:'다루다'},
+  {word:'happen',mean:'일어나다'},
+  {word:'harbor',mean:'항구'},
+  {word:'health',mean:'건강'},
+  {word:'height',mean:'높이'},
+  {word:'hidden',mean:'숨겨진'},
+  {word:'hollow',mean:'속이 빈'},
+  {word:'honor',mean:'명예'},
+  {word:'however',mean:'하지만'},
+  {word:'human',mean:'인간'},
+  {word:'humble',mean:'겸손한'},
+  {word:'imagine',mean:'상상하다'},
+  {word:'important',mean:'중요한'},
+  {word:'impossible',mean:'불가능한'},
+  {word:'interest',mean:'관심'},
+  {word:'invent',mean:'발명하다'},
+  {word:'isolate',mean:'고립시키다'},
+  {word:'jealous',mean:'질투하는'},
+  {word:'junior',mean:'손아래의'},
+  {word:'justice',mean:'정의'},
+  {word:'kingdom',mean:'왕국'},
+  {word:'kitchen',mean:'부엌'},
+  {word:'ladder',mean:'사다리'},
+  {word:'language',mean:'언어'},
+  {word:'lawyer',mean:'변호사'},
+  {word:'leader',mean:'지도자'},
+  {word:'length',mean:'길이'},
+  {word:'level',mean:'단계'},
+  {word:'living',mean:'살아있는'},
+  {word:'lonely',mean:'외로운'},
+  {word:'machine',mean:'기계'},
+  {word:'magnet',mean:'자석'},
+  {word:'manage',mean:'관리하다'},
+  {word:'manner',mean:'방식'},
+  {word:'marble',mean:'구슬'},
+  {word:'matter',mean:'문제'},
+  {word:'measure',mean:'측정하다'},
+  {word:'member',mean:'회원'},
+  {word:'mental',mean:'정신의'},
+  {word:'method',mean:'방법'},
+  {word:'middle',mean:'중간'},
+  {word:'minute',mean:'분'},
+  {word:'mistake',mean:'실수'},
+  {word:'moment',mean:'순간'},
+  {word:'motion',mean:'움직임'},
+  {word:'narrow',mean:'좁은'},
+  {word:'nation',mean:'국가'},
+  {word:'native',mean:'토착의'},
+  {word:'nervous',mean:'긴장한'},
+  {word:'normal',mean:'보통의'},
+  {word:'object',mean:'물체'},
+  {word:'observe',mean:'관찰하다'},
+  {word:'opinion',mean:'의견'},
+  {word:'opposite',mean:'반대의'},
+  {word:'ordinary',mean:'평범한'},
+  {word:'organize',mean:'정리하다'},
+  {word:'package',mean:'소포'},
+  {word:'palace',mean:'궁전'},
+  {word:'parent',mean:'부모'},
+  {word:'partner',mean:'동료'},
+  {word:'passage',mean:'통로'},
+  {word:'patient',mean:'환자'},
+  {word:'perfect',mean:'완벽한'},
+  {word:'period',mean:'기간'},
+  {word:'personal',mean:'개인의'},
+  {word:'physical',mean:'신체의'},
+  {word:'planet',mean:'행성'},
+  {word:'plastic',mean:'플라스틱'},
+  {word:'pleasant',mean:'즐거운'},
+  {word:'popular',mean:'인기있는'},
+  {word:'position',mean:'위치'},
+  {word:'possible',mean:'가능한'},
+  {word:'powerful',mean:'강력한'},
+  {word:'present',mean:'현재의'},
+  {word:'private',mean:'사적인'},
+  {word:'produce',mean:'생산하다'},
+  {word:'progress',mean:'진전'},
+  {word:'proper',mean:'적절한'},
+  {word:'public',mean:'공공의'},
+  {word:'purpose',mean:'목적'},
+  {word:'quality',mean:'품질'},
+  {word:'quarter',mean:'4분의 1'},
+  {word:'realize',mean:'깨닫다'},
+  {word:'receive',mean:'받다'},
+  {word:'record',mean:'기록'},
+  {word:'regular',mean:'규칙적인'},
+  {word:'remain',mean:'남아있다'},
+  {word:'remove',mean:'제거하다'},
+  {word:'repair',mean:'수리하다'},
+  {word:'repeat',mean:'반복하다'},
+  {word:'report',mean:'보고서'},
+  {word:'require',mean:'요구하다'},
+  {word:'research',mean:'연구'},
+  {word:'respect',mean:'존중하다'},
+  {word:'review',mean:'복습하다'},
+  {word:'riddle',mean:'수수께끼'},
+  {word:'rough',mean:'거친'},
+  {word:'royal',mean:'왕실의'},
+  {word:'safety',mean:'안전'},
+  {word:'sample',mean:'견본'},
+  {word:'satisfy',mean:'만족시키다'},
+  {word:'schedule',mean:'일정'},
+  {word:'secret',mean:'비밀'},
+  {word:'section',mean:'부분'},
+  {word:'serious',mean:'심각한'},
+  {word:'service',mean:'서비스'},
+  {word:'several',mean:'몇몇의'},
+  {word:'signal',mean:'신호'},
+  {word:'similar',mean:'비슷한'},
+  {word:'simple',mean:'간단한'},
+  {word:'single',mean:'하나의'},
+  {word:'social',mean:'사회적인'},
+  {word:'source',mean:'원천'},
+  {word:'special',mean:'특별한'},
+  {word:'speech',mean:'연설'},
+  {word:'spirit',mean:'정신'},
+  {word:'spread',mean:'퍼지다'},
+  {word:'square',mean:'정사각형'},
+  {word:'stable',mean:'안정된'},
+  {word:'standard',mean:'표준'},
+  {word:'station',mean:'역'},
+  {word:'strange',mean:'이상한'},
+  {word:'stream',mean:'시내'},
+  {word:'strength',mean:'힘'},
+  {word:'subject',mean:'주제'},
+  {word:'sudden',mean:'갑작스러운'},
+  {word:'surface',mean:'표면'},
+  {word:'surprise',mean:'놀라게 하다'},
+  {word:'survive',mean:'살아남다'},
+  {word:'symbol',mean:'상징'},
+  {word:'talent',mean:'재능'},
+  {word:'target',mean:'목표'},
+  {word:'temple',mean:'사원'},
+  {word:'terrible',mean:'끔찍한'},
+  {word:'theater',mean:'극장'},
+  {word:'therefore',mean:'그러므로'},
+  {word:'thought',mean:'생각'},
+  {word:'thousand',mean:'천'},
+  {word:'toward',mean:'~쪽으로'},
+  {word:'traffic',mean:'교통'},
+  {word:'training',mean:'훈련'},
+  {word:'translate',mean:'번역하다'},
+  {word:'trouble',mean:'문제'},
+  {word:'typical',mean:'전형적인'},
+  {word:'uniform',mean:'교복'},
+  {word:'unknown',mean:'알려지지 않은'},
+  {word:'unusual',mean:'특이한'},
+  {word:'valuable',mean:'가치있는'},
+  {word:'various',mean:'다양한'},
+  {word:'victory',mean:'승리'},
+  {word:'village',mean:'마을'},
+  {word:'violent',mean:'폭력적인'},
+  {word:'visitor',mean:'방문객'},
+  {word:'volcano',mean:'화산'},
+  {word:'weather',mean:'날씨'},
+  {word:'western',mean:'서쪽의'},
+  {word:'whether',mean:'~인지 아닌지'},
+  {word:'whisper',mean:'속삭이다'},
+  {word:'without',mean:'~없이'},
+  {word:'wonder',mean:'궁금해하다'},
+  {word:'wooden',mean:'나무로 된'},
+  {word:'worry',mean:'걱정하다'},
+  {word:'writer',mean:'작가'},
+  {word:'yesterday',mean:'어제'},
+  {word:'younger',mean:'더 어린'},
+  {word:'zebra',mean:'얼룩말'}];
+
+wordPool.push(
+  // verbs
+  {word:'add',mean:'더하다'},
+  {word:'bake',mean:'굽다'},
+  {word:'begin',mean:'시작하다'},
+  {word:'bite',mean:'물다'},
+  {word:'blow',mean:'불다'},
+  {word:'boil',mean:'끓이다'},
+  {word:'bring',mean:'가져오다'},
+  {word:'buy',mean:'사다'},
+  {word:'call',mean:'부르다'},
+  {word:'care',mean:'신경쓰다'},
+  {word:'check',mean:'확인하다'},
+  {word:'close',mean:'닫다'},
+  {word:'cook',mean:'요리하다'},
+  {word:'copy',mean:'베끼다'},
+  {word:'count',mean:'세다'},
+  {word:'cry',mean:'울다'},
+  {word:'cut',mean:'자르다'},
+  {word:'draw',mean:'그리다'},
+  {word:'drink',mean:'마시다'},
+  {word:'drive',mean:'운전하다'},
+  {word:'drop',mean:'떨어뜨리다'},
+  {word:'enjoy',mean:'즐기다'},
+  {word:'enter',mean:'들어가다'},
+  {word:'fail',mean:'실패하다'},
+  {word:'feed',mean:'먹이를 주다'},
+  {word:'fill',mean:'채우다'},
+  {word:'find',mean:'찾다'},
+  {word:'finish',mean:'끝내다'},
+  {word:'fix',mean:'고치다'},
+  {word:'fly',mean:'날다'},
+  {word:'grow',mean:'자라다'},
+  {word:'guess',mean:'추측하다'},
+  {word:'help',mean:'돕다'},
+  {word:'hide',mean:'숨다'},
+  {word:'hold',mean:'잡다'},
+  {word:'hope',mean:'바라다'},
+  {word:'hurry',mean:'서두르다'},
+  {word:'join',mean:'참여하다'},
+  {word:'keep',mean:'유지하다'},
+  {word:'kick',mean:'차다'},
+  {word:'knock',mean:'두드리다'},
+  {word:'lend',mean:'빌려주다'},
+  {word:'lift',mean:'들어올리다'},
+  {word:'lose',mean:'잃다'},
+  {word:'meet',mean:'만나다'},
+  {word:'miss',mean:'놓치다'},
+  {word:'mix',mean:'섞다'},
+  {word:'move',mean:'움직이다'},
+  {word:'need',mean:'필요하다'},
+  {word:'open',mean:'열다'},
+  {word:'paint',mean:'칠하다'},
+  {word:'pass',mean:'지나가다'},
+  {word:'pick',mean:'고르다'},
+  {word:'plan',mean:'계획하다'},
+  {word:'pour',mean:'붓다'},
+  {word:'reach',mean:'도착하다'},
+  {word:'rest',mean:'쉬다'},
+  {word:'ride',mean:'타다'},
+  {word:'rise',mean:'오르다'},
+  {word:'save',mean:'구하다'},
+  {word:'sell',mean:'팔다'},
+  {word:'send',mean:'보내다'},
+  {word:'shake',mean:'흔들다'},
+  {word:'shout',mean:'소리치다'},
+  {word:'sing',mean:'노래하다'},
+  {word:'sit',mean:'앉다'},
+  {word:'sleep',mean:'자다'},
+  {word:'smell',mean:'냄새 맡다'},
+  {word:'solve',mean:'풀다'},
+  {word:'spend',mean:'보내다'},
+  {word:'stand',mean:'서다'},
+  {word:'stay',mean:'머무르다'},
+  {word:'stop',mean:'멈추다'},
+  {word:'teach',mean:'가르치다'},
+  {word:'touch',mean:'만지다'},
+  {word:'turn',mean:'돌다'},
+  {word:'use',mean:'사용하다'},
+  {word:'wait',mean:'기다리다'},
+  {word:'walk',mean:'걷다'},
+  {word:'wash',mean:'씻다'},
+  {word:'watch',mean:'보다'},
+  {word:'wear',mean:'입다'},
+  {word:'win',mean:'이기다'},
+  {word:'work',mean:'일하다'},
+
+  // adjectives
+  {word:'able',mean:'할 수 있는'},
+  {word:'basic',mean:'기본적인'},
+  {word:'bold',mean:'대담한'},
+  {word:'calm',mean:'차분한'},
+  {word:'cheap',mean:'싼'},
+  {word:'clear',mean:'분명한'},
+  {word:'cool',mean:'시원한'},
+  {word:'cute',mean:'귀여운'},
+  {word:'dark',mean:'어두운'},
+  {word:'deep',mean:'깊은'},
+  {word:'dry',mean:'마른'},
+  {word:'easy',mean:'쉬운'},
+  {word:'fair',mean:'공정한'},
+  {word:'fast',mean:'빠른'},
+  {word:'full',mean:'가득 찬'},
+  {word:'huge',mean:'거대한'},
+  {word:'lazy',mean:'게으른'},
+  {word:'little',mean:'작은'},
+  {word:'long',mean:'긴'},
+  {word:'loud',mean:'시끄러운'},
+  {word:'low',mean:'낮은'},
+  {word:'lucky',mean:'운 좋은'},
+  {word:'main',mean:'주요한'},
+  {word:'modern',mean:'현대적인'},
+  {word:'old',mean:'오래된'},
+  {word:'poor',mean:'가난한'},
+  {word:'ready',mean:'준비된'},
+  {word:'rich',mean:'부유한'},
+  {word:'round',mean:'둥근'},
+  {word:'short',mean:'짧은'},
+  {word:'sick',mean:'아픈'},
+  {word:'soft',mean:'부드러운'},
+  {word:'sweet',mean:'달콤한'},
+  {word:'tall',mean:'키가 큰'},
+  {word:'thin',mean:'얇은'},
+  {word:'tiny',mean:'아주 작은'},
+  {word:'true',mean:'진실된'},
+  {word:'useful',mean:'유용한'},
+  {word:'warm',mean:'따뜻한'},
+  {word:'wet',mean:'젖은'},
+  {word:'wide',mean:'넓은'},
+  {word:'wild',mean:'야생의'},
+  {word:'young',mean:'어린'},
+  {word:'better',mean:'더 좋은'},
+  {word:'best',mean:'최고의'},
+  {word:'busy',mean:'바쁜'},
+  {word:'colorful',mean:'색이 화려한'},
+  {word:'comfortable',mean:'편안한'},
+  {word:'confident',mean:'자신감 있는'},
+  {word:'interesting',mean:'흥미로운'},
+  {word:'lovely',mean:'사랑스러운'},
+  {word:'natural',mean:'자연스러운'},
+  {word:'necessary',mean:'필요한'},
+  {word:'wonderful',mean:'멋진'},
+  {word:'foolish',mean:'어리석은'},
+  {word:'polite',mean:'예의 바른'},
+  {word:'rude',mean:'무례한'},
+  {word:'simple',mean:'간단한'},
+  {word:'heavy',mean:'무거운'},
+  {word:'lightweight',mean:'가벼운'},
+  {word:'empty',mean:'비어 있는'},
+  {word:'bright',mean:'밝은'},
+  {word:'brilliant',mean:'훌륭한'},
+  {word:'silent',mean:'조용한'},
+  {word:'smooth',mean:'매끄러운'},
+  {word:'rough',mean:'거친'},
+  {word:'fresh',mean:'신선한'},
+  {word:'sharp',mean:'날카로운'},
+  {word:'flat',mean:'평평한'},
+  {word:'safe',mean:'안전한'},
+  {word:'dangerous',mean:'위험한'},
+  {word:'honest',mean:'정직한'},
+  {word:'friendly',mean:'친근한'}
+);
+
+wordPool.push(
+  {word:'admire',mean:'존경하다'},
+  {word:'advise',mean:'조언하다'},
+  {word:'affect',mean:'영향을 주다'},
+  {word:'announce',mean:'발표하다'},
+  {word:'appear',mean:'나타나다'},
+  {word:'apply',mean:'지원하다'},
+  {word:'approach',mean:'다가가다'},
+  {word:'arrange',mean:'정리하다'},
+  {word:'assist',mean:'돕다'},
+  {word:'attach',mean:'붙이다'},
+  {word:'attend',mean:'참석하다'},
+  {word:'breathe',mean:'숨쉬다'},
+  {word:'cancel',mean:'취소하다'},
+  {word:'celebrate',mean:'축하하다'},
+  {word:'claim',mean:'주장하다'},
+  {word:'communicate',mean:'소통하다'},
+  {word:'complain',mean:'불평하다'},
+  {word:'confuse',mean:'혼란스럽게 하다'},
+  {word:'consider',mean:'고려하다'},
+  {word:'contain',mean:'포함하다'},
+  {word:'deliver',mean:'배달하다'},
+  {word:'depend',mean:'의존하다'},
+  {word:'design',mean:'설계하다'},
+  {word:'destroy',mean:'파괴하다'},
+  {word:'disappear',mean:'사라지다'},
+  {word:'discuss',mean:'토론하다'},
+  {word:'donate',mean:'기부하다'},
+  {word:'educate',mean:'교육하다'},
+  {word:'encourage',mean:'격려하다'},
+  {word:'exist',mean:'존재하다'},
+  {word:'express',mean:'표현하다'},
+  {word:'gather',mean:'모으다'},
+  {word:'guide',mean:'안내하다'},
+  {word:'identify',mean:'확인하다'},
+  {word:'introduce',mean:'소개하다'},
+  {word:'judge',mean:'판단하다'},
+  {word:'mention',mean:'언급하다'},
+  {word:'operate',mean:'작동하다'},
+  {word:'perform',mean:'수행하다'},
+  {word:'prefer',mean:'선호하다'},
+  {word:'prevent',mean:'막다'},
+  {word:'provide',mean:'제공하다'},
+  {word:'publish',mean:'출판하다'},
+  {word:'raise',mean:'올리다'},
+  {word:'reduce',mean:'줄이다'},
+  {word:'refuse',mean:'거절하다'},
+  {word:'relax',mean:'쉬다'},
+  {word:'release',mean:'풀어주다'},
+  {word:'remind',mean:'상기시키다'},
+  {word:'replace',mean:'대체하다'},
+  {word:'reply',mean:'대답하다'},
+  {word:'rescue',mean:'구조하다'},
+  {word:'serve',mean:'제공하다'},
+  {word:'settle',mean:'정착하다'},
+  {word:'slip',mean:'미끄러지다'},
+  {word:'succeed',mean:'성공하다'},
+  {word:'suffer',mean:'고통받다'},
+  {word:'trust',mean:'믿다'},
+  {word:'accurate',mean:'정확한'},
+  {word:'actual',mean:'실제의'},
+  {word:'additional',mean:'추가의'},
+  {word:'available',mean:'이용 가능한'},
+  {word:'awful',mean:'끔찍한'},
+  {word:'blind',mean:'눈이 먼'},
+  {word:'central',mean:'중심의'},
+  {word:'chemical',mean:'화학의'},
+  {word:'chief',mean:'주요한'},
+  {word:'daily',mean:'매일의'},
+  {word:'direct',mean:'직접적인'},
+  {word:'equal',mean:'같은'},
+  {word:'exact',mean:'정확한'},
+  {word:'familiar',mean:'익숙한'},
+  {word:'foreign',mean:'외국의'},
+  {word:'former',mean:'이전의'},
+  {word:'independent',mean:'독립적인'},
+  {word:'local',mean:'지역의'},
+  {word:'major',mean:'주요한'},
+  {word:'minor',mean:'작은'},
+  {word:'national',mean:'국가의'},
+  {word:'practical',mean:'실용적인'},
+  {word:'rare',mean:'드문'},
+  {word:'recent',mean:'최근의'},
+  {word:'responsible',mean:'책임감 있는'},
+  {word:'senior',mean:'선배의'},
+  {word:'separate',mean:'분리된'},
+  {word:'specific',mean:'구체적인'},
+  {word:'terrific',mean:'훌륭한'},
+  {word:'usual',mean:'평소의'},
+  {word:'wise',mean:'현명한'},
+  {word:'account',mean:'계좌'},
+  {word:'advantage',mean:'장점'},
+  {word:'advertisement',mean:'광고'},
+  {word:'article',mean:'기사'},
+  {word:'assignment',mean:'과제'},
+  {word:'audience',mean:'청중'},
+  {word:'background',mean:'배경'},
+  {word:'behavior',mean:'행동'},
+  {word:'belief',mean:'믿음'},
+  {word:'benefit',mean:'이익'},
+  {word:'bicycle',mean:'자전거'},
+  {word:'biology',mean:'생물학'},
+  {word:'business',mean:'사업'},
+  {word:'calendar',mean:'달력'},
+  {word:'capital',mean:'수도'},
+  {word:'career',mean:'직업'},
+  {word:'cause',mean:'원인'},
+  {word:'celebration',mean:'축하'},
+  {word:'character',mean:'인물'},
+  {word:'community',mean:'공동체'},
+  {word:'competition',mean:'대회'},
+  {word:'conversation',mean:'대화'},
+  {word:'customer',mean:'고객'},
+  {word:'dictionary',mean:'사전'},
+  {word:'difference',mean:'차이'},
+  {word:'discovery',mean:'발견'},
+  {word:'education',mean:'교육'},
+  {word:'environment',mean:'환경'},
+  {word:'experience',mean:'경험'},
+  {word:'experiment',mean:'실험'},
+  {word:'expression',mean:'표현'},
+  {word:'festival',mean:'축제'},
+  {word:'friendship',mean:'우정'},
+  {word:'government',mean:'정부'},
+  {word:'information',mean:'정보'},
+  {word:'invention',mean:'발명품'},
+  {word:'knowledge',mean:'지식'},
+  {word:'magazine',mean:'잡지'},
+  {word:'medicine',mean:'약'},
+  {word:'neighbor',mean:'이웃'},
+  {word:'newspaper',mean:'신문'},
+  {word:'opportunity',mean:'기회'},
+  {word:'paragraph',mean:'문단'},
+  {word:'passenger',mean:'승객'},
+  {word:'photograph',mean:'사진'},
+  {word:'pollution',mean:'오염'},
+  {word:'population',mean:'인구'},
+  {word:'relationship',mean:'관계'},
+  {word:'restaurant',mean:'식당'},
+  {word:'scientist',mean:'과학자'},
+  {word:'secretary',mean:'비서'},
+  {word:'society',mean:'사회'},
+  {word:'temperature',mean:'온도'},
+  {word:'tradition',mean:'전통'},
+  {word:'university',mean:'대학교'},
+  {word:'vegetable',mean:'채소'},
+  {word:'volunteer',mean:'자원봉사자'},
+  {word:'weekday',mean:'평일'},
+  {word:'workplace',mean:'직장'},
+  {word:'celebrity',mean:'유명인'},
+  {word:'apologize',mean:'사과하다'},
+  {word:'behave',mean:'행동하다'},
+  {word:'concentrate',mean:'집중하다'},
+  {word:'confirm',mean:'확인하다'},
+  {word:'construct',mean:'건설하다'},
+  {word:'contact',mean:'연락하다'},
+  {word:'defend',mean:'방어하다'},
+  {word:'delay',mean:'미루다'},
+  {word:'dislike',mean:'싫어하다'},
+  {word:'doubt',mean:'의심하다'},
+  {word:'exchange',mean:'교환하다'},
+  {word:'exercise',mean:'운동하다'},
+  {word:'expect',mean:'기대하다'},
+  {word:'explore',mean:'탐험하다'},
+  {word:'forgive',mean:'용서하다'},
+  {word:'influence',mean:'영향을 주다'},
+  {word:'interview',mean:'면접하다'},
+  {word:'recognize',mean:'알아보다'},
+  {word:'recommend',mean:'추천하다'},
+  {word:'recycle',mean:'재활용하다'},
+  {word:'regret',mean:'후회하다'},
+  {word:'respond',mean:'응답하다'},
+  {word:'average',mean:'평균의'},
+  {word:'boring',mean:'지루한'},
+  {word:'careless',mean:'부주의한'},
+  {word:'creative',mean:'창의적인'},
+  {word:'crowded',mean:'붐비는'},
+  {word:'detailed',mean:'상세한'},
+  {word:'emotional',mean:'감정적인'},
+  {word:'expensive',mean:'비싼'},
+  {word:'general',mean:'일반적인'},
+  {word:'helpful',mean:'도움이 되는'},
+  {word:'hopeful',mean:'희망적인'},
+  {word:'illegal',mean:'불법의'},
+  {word:'incorrect',mean:'틀린'},
+  {word:'individual',mean:'개별의'},
+  {word:'international',mean:'국제적인'},
+  {word:'kindhearted',mean:'마음씨 좋은'},
+  {word:'negative',mean:'부정적인'},
+  {word:'positive',mean:'긍정적인'},
+  {word:'successful',mean:'성공한'},
+  {word:'traditional',mean:'전통적인'},
+  {word:'unhappy',mean:'불행한'},
+  {word:'unhealthy',mean:'건강하지 않은'},
+  {word:'unlucky',mean:'운이 나쁜'},
+  {word:'absorb',mean:'흡수하다'},
+  {word:'achieve',mean:'성취하다'},
+  {word:'adapt',mean:'적응하다'},
+  {word:'adjust',mean:'조정하다'},
+  {word:'admit',mean:'인정하다'},
+  {word:'adopt',mean:'입양하다'},
+  {word:'advance',mean:'나아가다'},
+  {word:'analyze',mean:'분석하다'},
+  {word:'applaud',mean:'박수치다'},
+  {word:'attract',mean:'끌어당기다'},
+  {word:'bend',mean:'구부리다'},
+  {word:'bleed',mean:'피를 흘리다'},
+  {word:'blink',mean:'깜박이다'},
+  {word:'cheer',mean:'응원하다'},
+  {word:'compete',mean:'경쟁하다'},
+  {word:'compliment',mean:'칭찬하다'},
+  {word:'confess',mean:'고백하다'},
+  {word:'decorate',mean:'장식하다'},
+  {word:'drag',mean:'끌다'},
+  {word:'earn',mean:'벌다'},
+  {word:'elect',mean:'선출하다'},
+  {word:'employ',mean:'고용하다'},
+  {word:'enable',mean:'가능하게 하다'},
+  {word:'examine',mean:'조사하다'},
+  {word:'expand',mean:'확장하다'},
+  {word:'float',mean:'뜨다'},
+  {word:'fold',mean:'접다'},
+  {word:'freeze',mean:'얼다'},
+  {word:'impress',mean:'감동시키다'},
+  {word:'injure',mean:'다치게 하다'},
+  {word:'knit',mean:'뜨개질하다'},
+  {word:'march',mean:'행진하다'},
+  {word:'nod',mean:'끄덕이다'},
+  {word:'obey',mean:'복종하다'},
+  {word:'pause',mean:'멈추다'},
+  {word:'polish',mean:'닦다'},
+  {word:'pray',mean:'기도하다'},
+  {word:'pretend',mean:'~인 척하다'},
+  {word:'print',mean:'인쇄하다'},
+  {word:'reject',mean:'거절하다'},
+  {word:'roll',mean:'구르다'},
+  {word:'scream',mean:'비명을 지르다'},
+  {word:'select',mean:'선택하다'},
+  {word:'smash',mean:'박살내다'},
+  {word:'sneeze',mean:'재채기하다'},
+  {word:'stare',mean:'응시하다'},
+  {word:'stretch',mean:'늘이다'},
+  {word:'swallow',mean:'삼키다'},
+  {word:'sweep',mean:'쓸다'},
+  {word:'whistle',mean:'휘파람 불다'},
+  {word:'wrap',mean:'싸다'},
+  {word:'broad',mean:'넓은'},
+  {word:'chilly',mean:'쌀쌀한'},
+  {word:'civil',mean:'시민의'},
+  {word:'classic',mean:'고전적인'},
+  {word:'dizzy',mean:'어지러운'},
+  {word:'dull',mean:'따분한'},
+  {word:'firm',mean:'단단한'},
+  {word:'formal',mean:'공식적인'},
+  {word:'grateful',mean:'감사하는'},
+  {word:'harmful',mean:'해로운'},
+  {word:'ideal',mean:'이상적인'},
+  {word:'inner',mean:'안쪽의'},
+  {word:'jolly',mean:'쾌활한'},
+  {word:'legal',mean:'합법적인'},
+  {word:'loose',mean:'헐거운'},
+  {word:'abroad',mean:'해외에'},
+  {word:'acceptance',mean:'수락'},
+  {word:'accident',mean:'사고'},
+  {word:'achievement',mean:'성취'},
+  {word:'activity',mean:'활동'},
+  {word:'agreement',mean:'동의'},
+  {word:'arrival',mean:'도착'},
+  {word:'attention',mean:'주의'},
+  {word:'author',mean:'작가'},
+  {word:'beach',mean:'해변'},
+  {word:'birthday',mean:'생일'},
+  {word:'breakfast',mean:'아침식사'},
+  {word:'campus',mean:'캠퍼스'},
+  {word:'century',mean:'세기'},
+  {word:'challenge',mean:'도전'},
+  {word:'chapter',mean:'장'},
+  {word:'classmate',mean:'반 친구'},
+  {word:'collection',mean:'수집품'},
+  {word:'company',mean:'회사'},
+  {word:'concert',mean:'콘서트'},
+  {word:'contest',mean:'대회'},
+  {word:'continent',mean:'대륙'},
+  {word:'cousin',mean:'사촌'},
+  {word:'creature',mean:'생물'},
+  {word:'custom',mean:'관습'},
+  {word:'delivery',mean:'배달'},
+  {word:'department',mean:'부서'},
+  {word:'diary',mean:'일기'},
+  {word:'distance',mean:'거리'},
+  {word:'district',mean:'지역'},
+  {word:'entrance',mean:'입구'},
+  {word:'examination',mean:'시험'},
+  {word:'expert',mean:'전문가'},
+  {word:'failure',mean:'실패'},
+  {word:'furniture',mean:'가구'},
+  {word:'garage',mean:'차고'},
+  {word:'guest',mean:'손님'},
+  {word:'heroine',mean:'여주인공'},
+  {word:'hometown',mean:'고향'},
+  {word:'instruction',mean:'지시'},
+  {word:'instrument',mean:'악기'},
+  {word:'islander',mean:'섬사람'},
+  {word:'laboratory',mean:'실험실'},
+  {word:'lifestyle',mean:'생활방식'},
+  {word:'manager',mean:'관리자'},
+  {word:'material',mean:'재료'},
+  {word:'membership',mean:'회원자격'},
+  {word:'movement',mean:'움직임'},
+  {word:'musician',mean:'음악가'},
+  {word:'neighborhood',mean:'동네'},
+  {word:'officer',mean:'공무원'},
+  {word:'passion',mean:'열정'},
+  {word:'performance',mean:'공연'},
+  {word:'permission',mean:'허락'},
+  {word:'pressure',mean:'압박'},
+  {word:'principle',mean:'원칙'},
+  {word:'product',mean:'제품'},
+  {word:'project',mean:'프로젝트'},
+  {word:'property',mean:'재산'},
+  {word:'reaction',mean:'반응'},
+  {word:'reception',mean:'접수'},
+  {word:'resource',mean:'자원'},
+  {word:'responsibility',mean:'책임'},
+  {word:'ruler',mean:'자'},
+  {word:'scenery',mean:'풍경'},
+  {word:'sentence',mean:'문장'},
+  {word:'situation',mean:'상황'},
+  {word:'speaker',mean:'화자'},
+  {word:'stomach',mean:'배'},
+  {word:'strategy',mean:'전략'},
+  {word:'success',mean:'성공'},
+  {word:'technology',mean:'기술'},
+  {word:'tourist',mean:'관광객'},
+  {word:'vehicle',mean:'차량'},
+  {word:'vocabulary',mean:'어휘'},
+  {word:'warning',mean:'경고'},
+  {word:'wisdom',mean:'지혜'},
+  {word:'calculate',mean:'계산하다'},
+  {word:'capture',mean:'붙잡다'},
+  {word:'challenge',mean:'도전하다'},
+  {word:'combine',mean:'결합하다'},
+  {word:'complete',mean:'완성하다'},
+  {word:'concern',mean:'걱정시키다'},
+  {word:'control',mean:'통제하다'},
+  {word:'create',mean:'창조하다'},
+  {word:'decorate',mean:'장식하다'},
+  {word:'describe',mean:'묘사하다'},
+  {word:'develop',mean:'발전시키다'},
+  {word:'disagree',mean:'동의하지 않다'},
+  {word:'divide',mean:'나누다'},
+  {word:'educate',mean:'교육하다'},
+  {word:'encourage',mean:'격려하다'},
+  {word:'estimate',mean:'추정하다'},
+  {word:'explain',mean:'설명하다'},
+  {word:'express',mean:'표현하다'},
+  {word:'graduate',mean:'졸업하다'},
+  {word:'include',mean:'포함하다'},
+  {word:'increase',mean:'증가하다'},
+  {word:'invent',mean:'발명하다'},
+  {word:'invite',mean:'초대하다'},
+  {word:'maintain',mean:'유지하다'},
+  {word:'notice',mean:'알아차리다'},
+  {word:'organize',mean:'정리하다'},
+  {word:'persuade',mean:'설득하다'},
+  {word:'prepare',mean:'준비하다'},
+  {word:'protect',mean:'보호하다'},
+  {word:'realize',mean:'깨닫다'},
+  {word:'receive',mean:'받다'},
+  {word:'require',mean:'요구하다'},
+  {word:'respect',mean:'존중하다'},
+  {word:'search',mean:'찾다'},
+  {word:'support',mean:'지지하다'},
+  {word:'suppose',mean:'추측하다'},
+  {word:'translate',mean:'번역하다'},
+  {word:'understand',mean:'이해하다'},
+  {word:'active',mean:'활동적인'},
+  {word:'ancient',mean:'고대의'},
+  {word:'attractive',mean:'매력적인'},
+  {word:'automatic',mean:'자동의'},
+  {word:'basic',mean:'기본적인'},
+  {word:'brave',mean:'용감한'},
+  {word:'comfortable',mean:'편안한'},
+  {word:'confident',mean:'자신감 있는'},
+  {word:'convenient',mean:'편리한'},
+  {word:'correct',mean:'올바른'},
+  {word:'curious',mean:'호기심 많은'},
+  {word:'different',mean:'다른'},
+  {word:'difficult',mean:'어려운'},
+  {word:'effective',mean:'효과적인'},
+  {word:'electric',mean:'전기의'},
+  {word:'excellent',mean:'훌륭한'},
+  {word:'fantastic',mean:'환상적인'},
+  {word:'favorite',mean:'가장 좋아하는'},
+  {word:'flexible',mean:'유연한'},
+  {word:'generous',mean:'관대한'},
+  {word:'healthy',mean:'건강한'},
+  {word:'honest',mean:'정직한'},
+  {word:'important',mean:'중요한'},
+  {word:'impressive',mean:'인상적인'},
+  {word:'intelligent',mean:'똑똑한'},
+  {word:'nervous',mean:'긴장한'},
+  {word:'ordinary',mean:'평범한'},
+  {word:'peaceful',mean:'평화로운'},
+  {word:'personal',mean:'개인의'},
+  {word:'powerful',mean:'강력한'},
+  {word:'proper',mean:'적절한'},
+  {word:'quiet',mean:'조용한'},
+  {word:'regular',mean:'규칙적인'},
+  {word:'serious',mean:'심각한'},
+  {word:'similar',mean:'비슷한'},
+  {word:'social',mean:'사회적인'},
+  {word:'strange',mean:'이상한'},
+  {word:'terrible',mean:'끔찍한'},
+  {word:'valuable',mean:'가치 있는'},
+  {word:'various',mean:'다양한'}
+);
+
+
+// 중복 단어 제거
+const uniqueWordPool = [];
+const seenWords = new Set();
+
+wordPool.forEach(item => {
+  if (!item || !item.word || !item.mean) return;
+  const cleanWord = item.word.trim().toLowerCase();
+  const cleanMean = item.mean.trim();
+  if (!seenWords.has(cleanWord)) {
+    seenWords.add(cleanWord);
+    uniqueWordPool.push({word: cleanWord, mean: cleanMean});
+  }
+});
+
+// 100단계 복습 시스템
+// Level 1: 새 단어 1개
+// Level 2: 새 단어 2개
+// ...
+// Level 10: 새 단어 10개
+// Level 11: 새 단어 10개 + Level 1 단어
+// Level 12: 새 단어 10개 + Level 2 단어
+// Level 21: 새 단어 10개 + Level 11 단어
+const MAX_LEVEL = 100;
+const MAX_NEW_WORDS = 10;
+const REQUIRED_NEW_WORDS = 55 + ((MAX_LEVEL - 10) * MAX_NEW_WORDS); // 955개
+const packs = [];
+let wordCursor = 0;
+
+function getNextNewWord() {
+  if (wordCursor >= uniqueWordPool.length) {
+    console.warn('단어가 부족해서 처음 단어부터 다시 사용합니다.');
+    wordCursor = 0;
+  }
+  const item = uniqueWordPool[wordCursor];
+  wordCursor++;
+  return {word: item.word, mean: item.mean};
+}
+
+for (let level = 1; level <= MAX_LEVEL; level++) {
+  const currentPack = [];
+  const newWordCount = Math.min(level, MAX_NEW_WORDS);
+
+  for (let i = 0; i < newWordCount; i++) {
+    currentPack.push(getNextNewWord());
+  }
+
+  if (level > 10) {
+    const reviewPack = packs[level - 11];
+    reviewPack.forEach(item => {
+      currentPack.push({word: item.word, mean: item.mean});
+    });
+  }
+
+  packs.push(currentPack);
+}
+
+console.log(`총 단어 수: ${uniqueWordPool.length}`);
+console.log(`100단계까지 필요한 새 단어 수: ${REQUIRED_NEW_WORDS}`);
+console.log('생성된 packs:', packs);
+
+
+
+const Sound=(()=>{
+  let ctx=null, master=null, musicGain=null, sfxGain=null;
+  let mode='home', loopTimer=null, beat=0;
+  let muted=localStorage.getItem('wordSerpent:muted')==='1';
+  const AC=window.AudioContext||window.webkitAudioContext;
+
+  function setup(){
+    if(ctx||!AC) return;
+    ctx=new AC();
+    master=ctx.createGain();
+    musicGain=ctx.createGain();
+    sfxGain=ctx.createGain();
+    master.gain.value=muted?0:1;
+    musicGain.gain.value=.42;
+    sfxGain.gain.value=1.25;
+    musicGain.connect(master); sfxGain.connect(master); master.connect(ctx.destination);
+    updateButton();
+  }
+  function updateButton(){
+    if(!soundBtn) return;
+    soundBtn.textContent=muted?'🔇':'🔊';
+    soundBtn.title=muted?'Sound off':'Sound on';
+  }
+  function musicVolume(){return mode==='game'?.52:.40;}
+  function unlock(){
+    setup();
+    if(!ctx) return;
+    if(ctx.state==='suspended') ctx.resume();
+    updateButton();
+    startLoop();
+  }
+  function toggle(){
+    setup();
+    muted=!muted;
+    localStorage.setItem('wordSerpent:muted',muted?'1':'0');
+    if(master&&ctx){master.gain.setTargetAtTime(muted?0:1,ctx.currentTime,.035);} 
+    updateButton();
+    if(!muted) unlock();
+  }
+  function setMode(nextMode){
+    mode=nextMode==='game'?'game':'home';
+    if(musicGain&&ctx){musicGain.gain.setTargetAtTime(musicVolume(),ctx.currentTime,.2);} 
+    startLoop();
+  }
+  function startLoop(){
+    if(!ctx||ctx.state!=='running'||muted) return;
+    if(loopTimer) clearInterval(loopTimer);
+    beat=0;
+    if(mode==='game'){
+      gameLoop();
+      loopTimer=setInterval(gameLoop,430);
+    }else{
+      homeLoop();
+      loopTimer=setInterval(homeLoop,2400);
+    }
+  }
+  function tone(freq,dur,type='sine',gain=.08,delay=0,dest=null,endFreq=null){
+    setup(); if(!ctx||muted) return;
+    const t=ctx.currentTime+delay;
+    const o=ctx.createOscillator();
+    const g=ctx.createGain();
+    o.type=type;
+    o.frequency.setValueAtTime(Math.max(20,freq),t);
+    if(endFreq) o.frequency.exponentialRampToValueAtTime(Math.max(20,endFreq),t+dur*.92);
+    g.gain.setValueAtTime(.0001,t);
+    g.gain.exponentialRampToValueAtTime(gain,t+.015);
+    g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+    o.connect(g); g.connect(dest||sfxGain);
+    o.start(t); o.stop(t+dur+.04);
+  }
+  function noise(dur=.08,gain=.06,delay=0){
+    setup(); if(!ctx||muted) return;
+    const t=ctx.currentTime+delay;
+    const len=Math.max(1,Math.floor(ctx.sampleRate*dur));
+    const buf=ctx.createBuffer(1,len,ctx.sampleRate);
+    const data=buf.getChannelData(0);
+    for(let i=0;i<len;i++) data[i]=(Math.random()*2-1)*(1-i/len);
+    const src=ctx.createBufferSource(); src.buffer=buf;
+    const g=ctx.createGain();
+    g.gain.setValueAtTime(gain,t);
+    g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+    src.connect(g); g.connect(sfxGain);
+    src.start(t); src.stop(t+dur+.02);
+  }
+  function homeLoop(){
+    if(mode!=='home') return;
+    musicGain.gain.setTargetAtTime(musicVolume(),ctx.currentTime,.25);
+    const notes=[392,523.25,659.25,783.99,659.25,523.25];
+    notes.forEach((f,i)=>tone(f,.62,'triangle',.026,i*.28,musicGain));
+    tone(130.81,2.25,'sine',.032,0,musicGain);
+    tone(196,2.0,'sine',.018,.06,musicGain);
+  }
+  function gameLoop(){
+    if(mode!=='game') return;
+    musicGain.gain.setTargetAtTime(musicVolume(),ctx.currentTime,.18);
+    const bass=[98,110,130.81,146.83][beat%4];
+    tone(bass,.18,'sawtooth',.045,0,musicGain,bass*.7);
+    if(beat%2===0) tone(bass*2,.08,'square',.026,.18,musicGain);
+    if(beat%4===1) tone(523.25,.06,'triangle',.022,.08,musicGain);
+    if(beat%4===3) tone(659.25,.06,'triangle',.022,.12,musicGain);
+    noise(.035,.018,.29);
+    beat++;
+  }
+  function play(name){
+    setup(); if(!ctx||ctx.state!=='running'||muted) return;
+    switch(name){
+      case 'button': tone(560,.06,'triangle',.05); tone(760,.07,'triangle',.035,.055); break;
+      case 'correct': tone(523,.08,'triangle',.07); tone(659,.09,'triangle',.07,.08); tone(880,.12,'triangle',.065,.17); break;
+      case 'wrong': tone(230,.12,'sawtooth',.06,0,null,150); tone(150,.18,'sawtooth',.05,.08,null,90); break;
+      case 'shoot': tone(720,.07,'square',.05,0,null,1150); noise(.025,.035); break;
+      case 'hit': tone(150,.12,'sawtooth',.08,0,null,75); noise(.08,.075); break;
+      case 'reward': tone(659,.1,'triangle',.065); tone(880,.12,'triangle',.06,.1); tone(1175,.18,'triangle',.055,.22); break;
+      case 'collect': tone(784,.08,'triangle',.06); tone(1046,.1,'triangle',.045,.08); break;
+      case 'clear': tone(523,.1,'triangle',.06); tone(659,.1,'triangle',.06,.11); tone(784,.1,'triangle',.06,.22); tone(1046,.26,'triangle',.075,.35); break;
+      case 'over': tone(220,.18,'sawtooth',.07); tone(174,.22,'sawtooth',.06,.18); tone(130,.38,'sawtooth',.055,.38); break;
+      case 'rejoin': tone(420,.18,'sine',.04,0,null,260); noise(.12,.035); break;
+      default: tone(600,.08,'triangle',.04);
+    }
+  }
+  function duck(sec=1.1){
+    if(!ctx||!musicGain||muted) return;
+    const now=ctx.currentTime;
+    musicGain.gain.cancelScheduledValues(now);
+    musicGain.gain.setTargetAtTime(.16,now,.06);
+    setTimeout(()=>{ if(ctx&&musicGain&&!muted) musicGain.gain.setTargetAtTime(musicVolume(),ctx.currentTime,.25); },sec*1000);
+  }
+  updateButton();
+  return {unlock,toggle,setMode,play,duck};
+})();
+
+
+const SAVE_LAST_KEY='vocaBaaaam:lastPlayerKey';
+const SAVE_PREFIX='vocaBaaaam:player:';
+let player={academy:'',name:'',pin:'',key:'',cloudId:''};
+let academyAccessOk=false;
+
+function cleanAcademy(v){return String(v||'').trim().toLowerCase().replace(/\s+/g,'');}
+function cleanName(v){return String(v||'').trim().replace(/\s+/g,' ');}
+function cleanPin(v){return String(v||'').replace(/\D/g,'').slice(0,4);}
+function makePlayerKey(academy,name,pin){return SAVE_PREFIX+encodeURIComponent(academy)+':'+encodeURIComponent(name.toLowerCase())+':'+pin;}
+function simpleHash(str){
+  let h=2166136261;
+  str=String(str||'');
+  for(let i=0;i<str.length;i++){
+    h^=str.charCodeAt(i);
+    h=Math.imul(h,16777619);
+  }
+  return (h>>>0).toString(36);
+}
+function safeDocPart(v){
+  const s=encodeURIComponent(String(v||'').normalize('NFC').trim().toLowerCase()).replace(/[.]/g,'_');
+  return (s||'student').slice(0,90);
+}
+function makeStudentCloudId(academy,name,pin){
+  return `${safeDocPart(name)}_${simpleHash(`${academy}|${name.toLowerCase()}|${pin}`)}`;
+}
+function studentDocRef(info){
+  if(!db || !info || !info.academy) return null;
+  const academyId=safeDocPart(info.academy);
+  const studentId=info.cloudId || makeStudentCloudId(info.academy,info.name,info.pin);
+  return db.collection('academies').doc(academyId).collection('students').doc(studentId);
+}
+function academyAdminDocRef(academy){
+  if(!db || !academy) return null;
+  return db.collection('academies').doc(safeDocPart(academy)).collection('settings').doc('teacher');
+}
+async function verifyAcademyAccessForStudent(academy){
+  if(!firestoreReady || !db){
+    return {ok:false,msg:'Firebase 연결 전이라 학원코드를 확인할 수 없습니다. 인터넷 연결 후 다시 시도해 주세요.'};
+  }
+  try{
+    const ref=academyAdminDocRef(academy);
+    if(!ref) return {ok:false,msg:'학원코드를 확인할 수 없습니다.'};
+    const snap=await ref.get();
+    if(!snap.exists){
+      return {ok:false,msg:'등록되지 않은 학원코드입니다. 결제 완료 후 발급받은 학원코드를 입력해 주세요.'};
+    }
+    const data=snap.data()||{};
+    if(data.status && data.status !== 'active'){
+      return {ok:false,msg:'현재 사용이 중지된 학원코드입니다. 학원 선생님께 문의해 주세요.'};
+    }
+    const paymentStatus=data.paymentStatus || 'paid';
+    if(!['paid','trial'].includes(paymentStatus)){
+      return {ok:false,msg:'결제 완료 또는 체험 승인 상태가 아닌 학원코드입니다. 학원 선생님께 문의해 주세요.'};
+    }
+    return {ok:true,academyName:data.academyName||''};
+  }catch(err){
+    console.warn('학원코드 확인 실패',err);
+    return {ok:false,msg:'학원코드 확인 실패: 인터넷 연결 또는 Firestore 읽기 권한을 확인해 주세요.'};
+  }
+}
+function readSave(key){
+  try{return JSON.parse(localStorage.getItem(key)||'null');}catch(e){return null;}
+}
+function normalizeSave(raw){
+  if(!raw) return null;
+  const currentLevel=Math.max(1,Math.min(Number(raw.currentLevel||raw.level||1),packs.length));
+  const bestLevel=Math.max(0,Math.min(Number(raw.bestLevel ?? Math.max(0,currentLevel-1)),packs.length));
+  const totalClearedWords=Math.max(0,Number(raw.totalClearedWords||0));
+  const updatedAt=Number(raw.updatedAt||raw.lastPlayedAtMillis||Date.now());
+  return {...raw,level:currentLevel,currentLevel,bestLevel,totalClearedWords,updatedAt};
+}
+function chooseBetterSave(localSave,cloudSave){
+  const local=normalizeSave(localSave);
+  const cloud=normalizeSave(cloudSave);
+  if(!local) return cloud;
+  if(!cloud) return local;
+  if(cloud.currentLevel!==local.currentLevel) return cloud.currentLevel>local.currentLevel?cloud:local;
+  if(cloud.bestLevel!==local.bestLevel) return cloud.bestLevel>local.bestLevel?cloud:local;
+  if(cloud.totalClearedWords!==local.totalClearedWords) return cloud.totalClearedWords>local.totalClearedWords?cloud:local;
+  return cloud.updatedAt>local.updatedAt?cloud:local;
+}
+function saveLocalData(data){
+  if(!player.key) return data;
+  const localData={
+    academy:player.academy,
+    name:player.name,
+    pin:player.pin,
+    cloudId:player.cloudId,
+    level:data.currentLevel||data.level||1,
+    currentLevel:data.currentLevel||data.level||1,
+    bestLevel:data.bestLevel||0,
+    totalClearedWords:data.totalClearedWords||0,
+    lastClearedLevel:data.lastClearedLevel||0,
+    lastClearedWordCount:data.lastClearedWordCount||0,
+    updatedAt:data.updatedAt||Date.now()
+  };
+  try{
+    localStorage.setItem(player.key,JSON.stringify(localData));
+    localStorage.setItem(SAVE_LAST_KEY,player.key);
+  }catch(e){}
+  return localData;
+}
+function writeSave(savedLevel,extra={}){
+  if(!player.key) return null;
+  const existing=normalizeSave(readSave(player.key))||{};
+  const safeLevel=Math.max(1,Math.min(savedLevel||level,packs.length));
+  const clearedLevel=Number(extra.clearedLevel||0);
+  const clearedWords=Number(extra.clearedWords||0);
+  const data={
+    academy:player.academy,
+    name:player.name,
+    pin:player.pin,
+    cloudId:player.cloudId,
+    level:safeLevel,
+    currentLevel:safeLevel,
+    bestLevel:Math.max(existing.bestLevel||0,clearedLevel||0),
+    totalClearedWords:Math.max(0,Number(existing.totalClearedWords||0)+clearedWords),
+    lastClearedLevel:clearedLevel || existing.lastClearedLevel || 0,
+    lastClearedWordCount:clearedWords || existing.lastClearedWordCount || 0,
+    updatedAt:Date.now()
+  };
+  return saveLocalData(data);
+}
+async function readCloudSave(candidate){
+  if(!firestoreReady || !candidate) return null;
+  try{
+    const ref=studentDocRef(candidate);
+    if(!ref) return null;
+    const snap=await ref.get();
+    if(!snap.exists) return null;
+    const d=snap.data()||{};
+    return normalizeSave({
+      academy:candidate.academy,
+      name:d.studentName||candidate.name,
+      pin:candidate.pin,
+      cloudId:candidate.cloudId,
+      level:d.currentLevel||d.level||1,
+      currentLevel:d.currentLevel||d.level||1,
+      bestLevel:d.bestLevel||0,
+      totalClearedWords:d.totalClearedWords||0,
+      lastClearedLevel:d.lastClearedLevel||0,
+      lastClearedWordCount:d.lastClearedWordCount||0,
+      updatedAt:d.lastPlayedAtMillis||Date.now(),
+      fromCloud:true
+    });
+  }catch(err){
+    console.warn('Firestore 기록 불러오기 실패',err);
+    return null;
+  }
+}
+async function syncClearToFirestore(data){
+  if(!firestoreReady || !data || !player.academy) return;
+  try{
+    const access=await verifyAcademyAccessForStudent(player.academy);
+    if(!access.ok){
+      academyAccessOk=false;
+      console.warn('Firestore 저장 중단:',access.msg);
+      return;
+    }
+    academyAccessOk=true;
+    const ref=studentDocRef(player);
+    if(!ref) return;
+    await ref.set({
+      academyCode:player.academy,
+      studentName:player.name,
+      studentNameLower:player.name.toLowerCase(),
+      studentKey:player.cloudId,
+      currentLevel:data.currentLevel,
+      bestLevel:data.bestLevel,
+      totalClearedWords:data.totalClearedWords,
+      lastClearedLevel:data.lastClearedLevel||0,
+      lastClearedWordCount:data.lastClearedWordCount||0,
+      lastPlayedAt:firebase.firestore.FieldValue.serverTimestamp(),
+      lastPlayedAtMillis:data.updatedAt||Date.now(),
+      gameTitle:'VOCA BAAAAM!',
+      appVersion:'v12-firestore-paid-v3'
+    },{merge:true});
+    console.log('Firestore 저장 완료',player.academy,player.name,data);
+  }catch(err){
+    console.warn('Firestore 저장 실패. 로컬 저장은 유지됩니다.',err);
+  }
+}
+
+async function registerStudentLoginToFirestore(candidate,saveData,hasCloudRecord=false){
+  if(!firestoreReady || !candidate || !candidate.academy) return;
+  try{
+    const ref=studentDocRef(candidate);
+    if(!ref) return;
+    const now=Date.now();
+    const save=normalizeSave(saveData)||{};
+    const payload={
+      academyCode:candidate.academy,
+      studentName:candidate.name,
+      studentNameLower:candidate.name.toLowerCase(),
+      studentKey:candidate.cloudId,
+      currentLevel:save.currentLevel||save.level||1,
+      bestLevel:Number(save.bestLevel||0),
+      totalClearedWords:Number(save.totalClearedWords||0),
+      lastClearedLevel:Number(save.lastClearedLevel||0),
+      lastClearedWordCount:Number(save.lastClearedWordCount||0),
+      lastLoginAt:firebase.firestore.FieldValue.serverTimestamp(),
+      lastLoginAtMillis:now,
+      lastPlayedAt:firebase.firestore.FieldValue.serverTimestamp(),
+      lastPlayedAtMillis:now,
+      gameTitle:'VOCA BAAAAM!',
+      appVersion:'v12-firestore-paid-v3-student-login'
+    };
+    if(!hasCloudRecord){
+      payload.firstJoinedAt=firebase.firestore.FieldValue.serverTimestamp();
+      payload.firstJoinedAtMillis=now;
+    }
+    await ref.set(payload,{merge:true});
+    console.log('학생 로그인/등록 기록 저장 완료',candidate.academy,candidate.name);
+  }catch(err){
+    console.warn('학생 로그인/등록 기록 저장 실패. 레벨 클리어 시 다시 저장을 시도합니다.',err);
+  }
+}
+function recordLevelClear(){
+  const nextLevel=level<packs.length?level+1:level;
+  const data=writeSave(nextLevel,{clearedLevel:level,clearedWords:words.length});
+  syncClearToFirestore(data);
+  return data;
+}
+function applyPlayerFromInputs(){
+  const academy=cleanAcademy(academyCodeInput.value);
+  const name=cleanName(playerNameInput.value);
+  const pin=cleanPin(playerPinInput.value);
+  academyCodeInput.value=academy;
+  playerPinInput.value=pin;
+  if(!academy || !name || pin.length!==4) return null;
+  const key=makePlayerKey(academy,name,pin);
+  const cloudId=makeStudentCloudId(academy,name,pin);
+  return {academy,name,pin,key,cloudId,save:normalizeSave(readSave(key))};
+}
+function updateSaveInfo(){
+  saveInfo.style.display='block';
+  const candidate=applyPlayerFromInputs();
+  resetSaveBtn.disabled=true;
+  resetSaveBtn.style.display='none';
+  startBtn.textContent='START GAME';
+  if(!candidate){
+    saveInfo.className='save-info warn';
+    saveInfo.textContent='학원코드, 학생이름, 비밀번호 4자리를 입력하세요.';
+    return;
+  }
+  if(candidate.save && candidate.save.currentLevel){
+    saveInfo.className='save-info';
+    const date=candidate.save.updatedAt?new Date(candidate.save.updatedAt).toLocaleDateString('ko-KR'):'';
+    saveInfo.textContent=`이 기기 기록 있음: Level ${candidate.save.currentLevel}부터 이어하기 · 최고 클리어 ${candidate.save.bestLevel||0}단계${date?` · ${date}`:''}`;
+    startBtn.textContent=`LEVEL ${candidate.save.currentLevel}에서 이어하기`;
+    resetSaveBtn.disabled=false;
+    resetSaveBtn.style.display='inline-block';
+    resetSaveBtn.textContent='이 기기 저장 기록 삭제';
+  }else{
+    saveInfo.className='save-info';
+    saveInfo.textContent=firestoreReady?'새 학생입니다. START를 누르면 클라우드 기록도 확인합니다.':'새 학생입니다. Firebase 연결 전이면 로컬 저장만 됩니다.';
+  }
+}
+function loadLastPlayerToHome(){
+  try{
+    const key=localStorage.getItem(SAVE_LAST_KEY);
+    const saved=key?readSave(key):null;
+    if(saved&&saved.name&&saved.pin){
+      academyCodeInput.value=saved.academy||'';
+      playerNameInput.value=saved.name;
+      playerPinInput.value=saved.pin;
+    }
+  }catch(e){}
+  updateSaveInfo();
+}
+async function startWithPlayer(){
+  Sound.unlock();
+  Sound.play('button');
+  const candidate=applyPlayerFromInputs();
+  if(!candidate){
+    saveInfo.style.display='block';
+    saveInfo.className='save-info bad';
+    saveInfo.textContent='학원코드, 학생이름, 비밀번호 4자리를 먼저 입력해주세요.';
+    if(!cleanAcademy(academyCodeInput.value)) academyCodeInput.focus(); else if(!cleanName(playerNameInput.value)) playerNameInput.focus(); else playerPinInput.focus();
+    return;
+  }
+  startBtn.disabled=true;
+  const originalText=startBtn.textContent;
+  saveInfo.style.display='block';
+  saveInfo.className='save-info warn';
+  saveInfo.textContent='학원코드 사용 가능 여부를 확인하는 중입니다...';
+  try{
+    const access=await verifyAcademyAccessForStudent(candidate.academy);
+    if(!access.ok){
+      academyAccessOk=false;
+      saveInfo.className='save-info bad';
+      saveInfo.textContent=access.msg;
+      return;
+    }
+    academyAccessOk=true;
+    player={academy:candidate.academy,name:candidate.name,pin:candidate.pin,key:candidate.key,cloudId:candidate.cloudId};
+    saveInfo.className='save-info warn';
+    saveInfo.textContent=access.academyName?`${access.academyName} 학원 확인 완료. 클라우드 기록 확인 중...`:'학원코드 확인 완료. 클라우드 기록 확인 중...';
+    const cloudSave=await readCloudSave(candidate);
+    const selected=chooseBetterSave(candidate.save,cloudSave);
+    if(selected){
+      saveLocalData({...selected,currentLevel:selected.currentLevel||selected.level||1,level:selected.currentLevel||selected.level||1});
+    }
+    const savedLevel=selected&&(selected.currentLevel||selected.level)?(selected.currentLevel||selected.level):1;
+    level=Math.max(1,Math.min(savedLevel,packs.length));
+    const localStartSave=writeSave(level);
+    saveInfo.className='save-info warn';
+    saveInfo.textContent='학생 기록을 등록하는 중입니다...';
+    await registerStudentLoginToFirestore(candidate,selected||localStartSave,!!cloudSave);
+    if(cloudSave){
+      saveInfo.className='save-info';
+      saveInfo.textContent=`클라우드 기록 확인 완료: Level ${level}부터 시작합니다.`;
+    }else{
+      saveInfo.className='save-info';
+      saveInfo.textContent=`학생 등록 완료: Level ${level}부터 시작합니다.`;
+    }
+    warmSpeech();
+    beginLevel('spell');
+  }catch(err){
+    console.warn(err);
+    academyAccessOk=false;
+    saveInfo.className='save-info bad';
+    saveInfo.textContent='시작 실패: 인터넷 연결 또는 Firestore 권한을 확인해 주세요.';
+  }finally{
+    startBtn.disabled=false;
+    startBtn.textContent=originalText;
+  }
+}
+function resetCurrentSave(){
+  const candidate=applyPlayerFromInputs();
+  if(!candidate) return;
+  try{localStorage.removeItem(candidate.key);}catch(e){}
+  updateSaveInfo();
+}
+
+let W=0,H=0,DPR=1;
+let stars=[];
+let pathPoints=[], pathLines=[], pathTotal=0;
+let last=0,time=0;
+let state='home';
+let level=1,phase='spell',words=packs[0],wordIndex=0;
+let serpent=null;
+let arrows=[];
+let particles=[];
+let popTexts=[];
+let shake=0;
+let attack=null;
+let rejoin=null;
+let transitionLock=false;
+let nextAfterCollect='study';
+
+function resize(){
+  DPR=Math.max(1,Math.min(2,window.devicePixelRatio||1));
+  const r=app.getBoundingClientRect();
+  W=r.width; H=r.height;
+  [bg,game].forEach(cv=>{cv.width=Math.floor(W*DPR);cv.height=Math.floor(H*DPR);cv.style.width=W+'px';cv.style.height=H+'px';});
+  b.setTransform(DPR,0,0,DPR,0,0); c.setTransform(DPR,0,0,DPR,0,0);
+  createStars(); buildPath(); drawBackground(0);
+  if(state==='game' && serpent){layoutSerpent(serpent,true)}
+}
+
+function buildPath(){
+  pathPoints=[]; pathLines=[]; pathTotal=0;
+  const marginX=Math.max(34, W*.09);
+  const right=W-marginX, left=marginX;
+  const top=Math.max(92, H*.115);
+  const gap=Math.max(76, Math.min(104, H*.122));
+  const bottomLimit=warriorY()-118;
+  let y=top;
+  let goLeft=true;
+  pathPoints.push({x:right,y});
+  while(y<bottomLimit){
+    pathPoints.push({x:goLeft?left:right,y});
+    y+=gap;
+    if(y>=bottomLimit) break;
+    pathPoints.push({x:goLeft?left:right,y});
+    goLeft=!goLeft;
+  }
+  // 마지막에는 전사 바로 위쪽까지 이어져서 게임오버 판정이 자연스럽게 납니다.
+  const last=pathPoints[pathPoints.length-1];
+  if(last.y<bottomLimit) pathPoints.push({x:last.x,y:bottomLimit});
+  for(let i=0;i<pathPoints.length-1;i++){
+    const a=pathPoints[i], d=pathPoints[i+1];
+    const dx=d.x-a.x, dy=d.y-a.y;
+    const len=Math.hypot(dx,dy)||1;
+    pathLines.push({a,d,dx,dy,len,start:pathTotal,ang:Math.atan2(dy,dx)});
+    pathTotal+=len;
+  }
+}
+
+function pointAtPath(dist){
+  if(!pathLines.length) return {x:W/2,y:100,angle:Math.PI};
+  const first=pathLines[0];
+  if(dist<=0){
+    const u=dist/first.len;
+    return {x:first.a.x+first.dx*u, y:first.a.y+first.dy*u, angle:first.ang};
+  }
+  for(const line of pathLines){
+    if(dist<=line.start+line.len){
+      const u=(dist-line.start)/line.len;
+      return {x:line.a.x+line.dx*u, y:line.a.y+line.dy*u, angle:line.ang};
+    }
+  }
+  const last=pathLines[pathLines.length-1];
+  const extra=dist-pathTotal;
+  return {x:last.d.x+Math.cos(last.ang)*extra, y:last.d.y+Math.sin(last.ang)*extra, angle:last.ang};
+}
+window.addEventListener('resize',resize,{passive:true});
+
+function createStars(){
+  stars=[];
+  for(let i=0;i<120;i++) stars.push({x:Math.random(),y:Math.random(),r:Math.random()*1.35+.25,a:Math.random()*.45+.05,p:Math.random()*Math.PI*2});
+}
+
+function drawBackground(t){
+  b.clearRect(0,0,W,H);
+  const g=b.createRadialGradient(W*.52,H*.18,10,W*.5,H*.48,H*.85);
+  g.addColorStop(0,'#602145'); g.addColorStop(.46,'#1d0e31'); g.addColorStop(1,'#05020b');
+  b.fillStyle=g; b.fillRect(0,0,W,H);
+  for(const s of stars){
+    b.globalAlpha=s.a*(.55+.45*Math.sin(t*1.7+s.p));
+    b.fillStyle='#fff'; b.beginPath(); b.arc(s.x*W,s.y*H,s.r,0,Math.PI*2); b.fill();
+  }
+  b.globalAlpha=1;
+
+  // 뱀이 이동할 지그재그 길을 아주 은은하게 표시합니다.
+  if(pathPoints.length>1){
+    b.save();
+    b.lineCap='round'; b.lineJoin='round';
+    b.beginPath();
+    pathPoints.forEach((p,i)=> i?b.lineTo(p.x,p.y):b.moveTo(p.x,p.y));
+    b.strokeStyle='rgba(255,209,102,.12)'; b.lineWidth=18; b.stroke();
+    b.beginPath();
+    pathPoints.forEach((p,i)=> i?b.lineTo(p.x,p.y):b.moveTo(p.x,p.y));
+    b.strokeStyle='rgba(255,209,102,.28)'; b.lineWidth=2; b.setLineDash([10,14]); b.stroke();
+    b.restore();
+  }
+
+  const cx=W/2, cy=warriorY()+8, base=Math.min(W,H)*.28;
+  for(let i=0;i<6;i++){
+    b.beginPath(); b.arc(cx,cy,base+i*12,0,Math.PI*2);
+    b.strokeStyle=`rgba(255,${130+i*16},56,${.24-i*.026})`;
+    b.lineWidth=i===0?4:2; b.stroke();
+  }
+}
+
+function warriorY(){return H-Math.max(205,Math.min(230,H*.27));}
+
+function hideAllScreens(){Object.values(screens).forEach(s=>s.classList.remove('active'));}
+function showScreen(name){
+  hideAllScreens();
+  hud.classList.toggle('active',name==='game');
+  if(backBtn) backBtn.classList.toggle('show',name!=='home');
+  Sound.setMode(name==='game'?'game':'home');
+  if(name!=='game' && screens[name]) screens[name].classList.add('active');
+}
+function clearStage(){
+  arrows=[]; particles=[]; popTexts=[]; attack=null; rejoin=null; serpent=null; transitionLock=false; shake=0;
+  c.clearRect(0,0,W,H);
+  input.disabled=true; shootBtn.disabled=true; input.blur();
+}
+
+function goBackHome(){
+  Sound.play('button');
+  clearStage();
+  state='home';
+  showScreen('home');
+  updateSaveInfo();
+}
+
+function scramble(word){
+  const a=word.split('');
+  for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];}
+  const s=a.join('');
+  return (s===word && word.length>1) ? s.slice(1)+s[0] : s;
+}
+
+function currentPack(){return packs[Math.min(level-1,packs.length-1)];}
+
+function warmSpeech(){
+  try{ if('speechSynthesis' in window){ speechSynthesis.getVoices(); } }catch(e){}
+}
+function speakWord(word){
+  if(!word) return;
+  Sound.duck(1.15);
+  try{
+    if('speechSynthesis' in window){
+      const u=new SpeechSynthesisUtterance(String(word).toLowerCase());
+      u.lang='en-US'; u.rate=.78; u.pitch=1.05; u.volume=.86;
+      speechSynthesis.cancel();
+      speechSynthesis.speak(u);
+      return;
+    }
+  }catch(e){}
+}
+
+function makeSerpent(wordList){
+  const radius=Math.max(19,Math.min(26,W*.058));
+  const gap=radius*1.56;
+  const segments=[];
+  const displayWords=wordList.map(w=>(phase==='spell'?w.word:scramble(w.word)).toUpperCase());
+  let id=0, order=0;
+
+  // order가 0인 머리가 가장 앞입니다. 화면에서는 가장 아래쪽에 있어야 '머리부터 내려오는' 느낌이 납니다.
+  segments.push({id:id++,order:order++,x:W/2,y:0,r:radius*1.12,letter:'',visible:true,popped:false,head:true,spacer:false});
+  segments.push({id:id++,order:order++,x:W/2,y:0,r:radius*.96,letter:'',visible:true,popped:false,head:false,spacer:true});
+
+  // 각 단어는 절대 서로 섞지 않습니다. 단어 단위로만 철자를 배치합니다.
+  // 머리가 시작점이므로, 알파벳도 머리 바로 뒤에서부터 A-P-P-L-E 순서로 붙습니다.
+  displayWords.forEach((display,wi)=>{
+    for(let ci=0;ci<display.length;ci++){
+      segments.push({
+        id:id++,order:order++,x:W/2,y:0,r:radius,letter:display[ci],visible:true,popped:false,
+        head:false,spacer:false,targetLetter:true,wordIndex:wi,charIndex:ci
+      });
+    }
+    if(wi<displayWords.length-1){
+      segments.push({id:id++,order:order++,x:W/2,y:0,r:radius*.9,letter:'',visible:true,popped:false,head:false,spacer:true,betweenWords:true});
+    }
+  });
+
+  const s={wordList,displayWords,segments,headProgress:Math.min(gap*1.8,86),gap,speed:phase==='spell'?38+level*2.2:43+level*2.4};
+
+  // 지그재그 길의 우측 상단에서 시작합니다.
+  // 몸통은 오른쪽 바깥에서 따라 들어오므로, 단어가 많아져도 시작부터 전사 가까이 있지 않습니다.
+  layoutSerpent(s,true);
+  return s;
+}
+
+function layoutSerpent(s,instant=false){
+  if(!s) return;
+  const wiggle=Math.min(11, W*.024);
+  for(const seg of s.segments){
+    const o=seg.order;
+    const base=pointAtPath(s.headProgress - o*s.gap);
+    const nx=-Math.sin(base.angle), ny=Math.cos(base.angle);
+    const wave=Math.sin(time*5.4+o*.82)*wiggle + Math.sin(time*9+o*.31)*2.2;
+    const targetX=base.x + nx*wave;
+    const targetY=base.y + ny*wave;
+    seg.angle=base.angle;
+    if(instant){seg.x=targetX;seg.y=targetY;} else {seg.x += (targetX-seg.x)*.58; seg.y += (targetY-seg.y)*.58;}
+  }
+}
+
+function easeInOutCubic(t){
+  return t<.5 ? 4*t*t*t : 1-Math.pow(-2*t+2,3)/2;
+}
+function lerp(a,b,t){return a+(b-a)*t;}
+
+function startHeadRejoinAnimation(s,onDone){
+  if(!s){ if(onDone) onDone(); return; }
+
+  // 다음 단어의 현재 위치를 보존한 채, 머리만 뒤로 돌아가 붙는 애니메이션입니다.
+  // 핵심: headProgress와 각 마디의 order를 동시에 보간하면 뒤 단어가 순간이동하지 않습니다.
+  const nextTargets=s.segments
+    .filter(seg=>seg.visible&&!seg.popped&&seg.targetLetter&&seg.wordIndex===wordIndex)
+    .sort((a,b)=>a.order-b.order);
+  const anchor=nextTargets[0]||null;
+
+  const ordered=s.segments.filter(seg=>seg.visible&&!seg.popped).sort((a,b)=>a.order-b.order);
+  const cleaned=[];
+  for(const seg of ordered){
+    if(!seg.head && seg.spacer){
+      const prev=cleaned[cleaned.length-1];
+      if(!prev || (prev.spacer&&!prev.head)){seg.visible=false; continue;}
+    }
+    cleaned.push(seg);
+  }
+  while(cleaned.length && cleaned[cleaned.length-1].spacer){cleaned.pop().visible=false;}
+
+  if(!anchor){
+    cleaned.forEach((seg,idx)=>seg.order=idx);
+    layoutSerpent(s,false);
+    if(onDone) onDone();
+    return;
+  }
+
+  const anchorAbs=s.headProgress - anchor.order*s.gap;
+  const newAnchorOrder=cleaned.findIndex(seg=>seg.id===anchor.id);
+  const endHead=anchorAbs + newAnchorOrder*s.gap;
+  const startHead=s.headProgress;
+  const distance=Math.abs(startHead-endHead);
+
+  rejoin={
+    serpent:s,
+    elapsed:0,
+    duration:Math.max(.55,Math.min(1.15,distance/285)),
+    startHead,
+    endHead,
+    items:cleaned.map((seg,idx)=>({seg,from:seg.order,to:idx})),
+    onDone
+  };
+  transitionLock=true;
+  Sound.play('rejoin');
+  goalText.textContent='좋아요! 머리가 다음 단어 쪽으로 돌아가는 중...';
+}
+
+function updateRejoin(dt){
+  if(!rejoin) return;
+  const r=rejoin;
+  r.elapsed+=dt;
+  const t=Math.min(1,r.elapsed/r.duration);
+  const e=easeInOutCubic(t);
+  r.serpent.headProgress=lerp(r.startHead,r.endHead,e);
+  for(const item of r.items){ item.seg.order=lerp(item.from,item.to,e); }
+  if(t>=1){
+    for(const item of r.items){ item.seg.order=item.to; }
+    const done=r.onDone;
+    rejoin=null;
+    transitionLock=false;
+    layoutSerpent(r.serpent,false);
+    if(done) done();
+  }
+}
+
+function updateCurrentHud(){
+  const w=words[wordIndex];
+  levelText.textContent=String(level);
+  phaseText.textContent=phase==='spell'?'SPELL':'ANAGRAM';
+  countText.textContent=`${wordIndex+1}/${words.length}`;
+  playerTag.innerHTML=player.name?`<b>${player.name}</b> · ${player.academy}`:'';
+  goalText.textContent=phase==='spell'?'뱀의 철자를 보고 단어 입력!':'섞인 철자를 보고 원래 단어 입력!';
+}
+
+function beginLevel(nextPhase){
+  phase=nextPhase;
+  words=currentPack();
+  wordIndex=0;
+  writeSave(level);
+  beginWord();
+}
+
+function beginWord(){
+  clearStage();
+  state='game';
+  showScreen('game');
+  serpent=makeSerpent(words);
+  wordIndex=0;
+  updateCurrentHud();
+  input.value=''; input.placeholder='type + enter'; input.disabled=false; shootBtn.disabled=false;
+  setTimeout(()=>{if(state==='game') input.focus();},160);
+}
+
+function wordLabel(w){return `${w.word.toLowerCase()}(${w.mean})`;}
+function fillList(id,list){
+  const ul=document.getElementById(id); ul.innerHTML='';
+  list.forEach(w=>{
+    const li=document.createElement('li');
+    li.className='clickable';
+    li.innerHTML=`<b>${w.word.toUpperCase()}</b><em>${w.mean}</em>`;
+    li.addEventListener('click',()=>{Sound.play('button'); speakWord(w.word);});
+    ul.appendChild(li);
+  });
+}
+
+function showCollect(nextAction){
+  clearStage();
+  Sound.play('reward');
+  state='collect';
+  nextAfterCollect=nextAction;
+  document.getElementById('collectTitle').textContent=phase==='spell'?'SPELL 성공!':'ANAGRAM 성공!';
+  document.getElementById('collectDesc').textContent='성공한 단어를 눌러 내 보관함에 넣으세요. 누를 때마다 발음이 나옵니다.';
+  const reward=document.getElementById('rewardWords');
+  const vault=document.getElementById('vaultBox');
+  const next=document.getElementById('collectNextBtn');
+  reward.innerHTML='';
+  vault.innerHTML='<span class="empty-vault">단어를 클릭해서 보관함으로 옮기기</span>';
+  next.disabled=true;
+  next.textContent='단어를 모두 보관하세요';
+  let moved=0;
+  words.forEach((w,idx)=>{
+    const chip=document.createElement('button');
+    chip.type='button'; chip.className='word-chip'; chip.textContent=wordLabel(w);
+    chip.addEventListener('click',()=>{
+      if(chip.dataset.moved==='1') return;
+      Sound.play('collect');
+      speakWord(w.word);
+      chip.dataset.moved='1';
+      chip.classList.add('moved');
+      chip.textContent='보관 완료 ✓';
+      chip.disabled=true;
+      const empty=vault.querySelector('.empty-vault');
+      if(empty) empty.remove();
+      const saved=document.createElement('button');
+      saved.type='button'; saved.className='word-chip saved'; saved.textContent=wordLabel(w);
+      saved.addEventListener('click',()=>{Sound.play('button'); speakWord(w.word);});
+      vault.appendChild(saved);
+      moved++;
+      if(moved>=words.length){
+        next.disabled=false;
+        next.textContent=nextAfterCollect==='study'?'WORD STUDY로 이동':'LEVEL CLEAR 확인';
+      }
+    });
+    reward.appendChild(chip);
+  });
+  showScreen('collect');
+}
+
+function showStudy(){
+  clearStage();
+  state='study';
+  fillList('studyList',words);
+  showScreen('study');
+}
+function showClear(){
+  Sound.play('clear');
+  clearStage();
+  state='clear';
+  fillList('clearList',words);
+  document.getElementById('clearTitle').textContent=`LEVEL ${level} CLEAR!`;
+  document.getElementById('clearDesc').textContent=level>=packs.length?'마지막 레벨까지 완료했어요!':'다음 레벨로 이동할 준비가 되었어요.';
+  recordLevelClear();
+  showScreen('clear');
+}
+function showOver(){
+  Sound.play('over');
+  clearStage();
+  state='over';
+  showScreen('over');
+}
+
+function flashScreen(){flash.classList.remove('on'); void flash.offsetWidth; flash.classList.add('on');}
+function wrong(){Sound.play('wrong'); input.classList.remove('wrong'); void input.offsetWidth; input.classList.add('wrong'); shake=7;}
+
+function getCurrentTargets(){
+  if(!serpent) return [];
+  return serpent.segments
+    .filter(seg=>seg.targetLetter && seg.wordIndex===wordIndex && seg.letter && !seg.popped && seg.visible)
+    .sort((a,b)=>a.charIndex-b.charIndex);
+}
+
+function fire(){
+  if(state!=='game'||!serpent) return;
+
+  // 화살이 날아가는 중에도 타이핑은 계속 가능하게 둡니다.
+  // 단, 같은 공격이 중복으로 시작되면 표적/단어 순서가 꼬일 수 있으므로 Enter만 잠깐 무시합니다.
+  if(attack||transitionLock){
+    goalText.textContent=attack?'공격 중! 다음 단어를 미리 입력하세요.':'머리가 붙는 중! 다음 단어를 미리 입력하세요.';
+    input.disabled=false; shootBtn.disabled=false; input.focus();
+    return;
+  }
+
+  const correct=words[wordIndex].word.toLowerCase();
+  const typed=input.value.trim().toLowerCase();
+  if(typed!==correct){wrong(); return;}
+  Sound.play('correct');
+  speakWord(correct);
+  const targets=getCurrentTargets();
+  if(targets.length===0) return;
+
+  // 정답 후 입력창을 바로 비워서 다음 단어를 미리 타이핑할 수 있게 합니다.
+  input.value='';
+  input.disabled=false; shootBtn.disabled=false; input.focus();
+  goalText.textContent=`정답! 화살 ${targets.length}발 연속 발사!`;
+
+  attack={targets,index:0,popped:0,done:false,nextShotIn:0,shotGap:.055};
+  launchNextArrow();
+}
+
+function launchNextArrow(){
+  if(!attack||attack.done||state!=='game'||!serpent) return;
+  if(attack.index>=attack.targets.length) return;
+  const target=attack.targets[attack.index];
+  Sound.play('shoot');
+  arrows.push({x:W/2-14,y:warriorY()-34,target,age:0,hit:false,speed:1500});
+  attack.index++;
+}
+
+function updateAttack(dt){
+  if(!attack||attack.done||state!=='game'||!serpent) return;
+  if(attack.index>=attack.targets.length) return;
+  attack.nextShotIn-=dt;
+  if(attack.nextShotIn<=0){
+    launchNextArrow();
+    attack.nextShotIn=attack.shotGap;
+  }
+}
+
+function finishWordAfterHits(){
+  if(!attack||attack.done||transitionLock) return;
+  attack.done=true;
+  attack=null;
+  shake=10;
+  wordIndex++;
+
+  if(wordIndex>=words.length){
+    transitionLock=true;
+    goalText.textContent='좋아요! 단계 정리 중...';
+    setTimeout(()=>{
+      if(state!=='game') return;
+      if(phase==='spell') showCollect('study'); else showCollect('clear');
+    },320);
+    return;
+  }
+
+  startHeadRejoinAnimation(serpent,()=>{
+    if(state!=='game') return;
+    // 공격 중 미리 입력한 다음 단어는 지우지 않습니다.
+    input.disabled=false; shootBtn.disabled=false;
+    updateCurrentHud();
+    setTimeout(()=>{if(state==='game') input.focus();},80);
+  });
+}
+
+function hitSegment(seg){
+  if(!seg||seg.popped) return;
+  Sound.play('hit');
+  const x=seg.x,y=seg.y;
+  seg.popped=true; seg.visible=false; seg.letter='';
+  explode(x,y); popTexts.push({x:x-24,y:y-24,life:1,txt:'HIT!'}); shake=9;
+
+  if(attack && attack.targets.includes(seg)){
+    attack.popped=(attack.popped||0)+1;
+    if(attack.popped>=attack.targets.length){
+      setTimeout(()=>{ if(state==='game' && attack && !attack.done) finishWordAfterHits(); },90);
+    }
+  }
+}
+
+function explode(x,y){
+  for(let i=0;i<34;i++){
+    const a=Math.random()*Math.PI*2, sp=Math.random()*4.8+1.8;
+    particles.push({x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:1,r:Math.random()*4+2,color:Math.random()<.6?'#ffd166':'#ff4054'});
+  }
+}
+
+function updateArrows(dt){
+  for(const a of arrows){
+    if(a.hit) continue;
+    a.age+=dt;
+    const target=a.target;
+    if(!target || target.popped){a.hit=true; continue;}
+    const dx=target.x-a.x, dy=target.y-a.y;
+    const d=Math.hypot(dx,dy)||1;
+    const speed=(a.speed||1500)*dt;
+    if(d<speed+target.r*.55 || a.age>2.2){
+      a.x=target.x; a.y=target.y; a.hit=true; hitSegment(target);
+    }else{
+      a.x += dx/d*speed;
+      a.y += dy/d*speed;
+    }
+  }
+  arrows=arrows.filter(a=>!a.hit);
+}
+
+function updateGame(dt){
+  if(state!=='game'||!serpent) return;
+
+  updateAttack(dt);
+
+  if(rejoin){
+    updateRejoin(dt);
+  }else{
+    // 공격 중에도 뱀은 멈추지 않습니다.
+    serpent.headProgress += serpent.speed*dt;
+  }
+
+  const head=serpent.segments[0];
+  if(!rejoin && head && (head.y > warriorY()-78 || serpent.headProgress>pathTotal+80)) showOver();
+  layoutSerpent(serpent,false);
+  updateArrows(dt);
+}
+
+function drawSerpent(){
+  if(state!=='game'||!serpent) return;
+  const segs=serpent.segments;
+  for(let i=segs.length-1;i>=0;i--) drawSegment(segs[i]);
+}
+
+function drawSegment(seg){
+  if(!seg.visible) return;
+  const x=seg.x, y=seg.y, r=seg.r;
+  c.save();
+  c.shadowColor='rgba(255,35,55,.65)'; c.shadowBlur=14;
+  const g=c.createRadialGradient(x-r*.35,y-r*.45,3,x,y,r*1.15);
+  g.addColorStop(0,'#ffb0aa'); g.addColorStop(.34,'#ff4054'); g.addColorStop(1,'#790714');
+  c.fillStyle=g; c.beginPath();
+  if(seg.head) c.ellipse(x,y,r*1.13,r*.92,Math.sin(time*2)*.08,0,Math.PI*2); else c.arc(x,y,r,0,Math.PI*2);
+  c.fill();
+  c.shadowBlur=0; c.strokeStyle='rgba(38,0,13,.72)'; c.lineWidth=2.2; c.stroke();
+  if(seg.targetLetter && seg.wordIndex===wordIndex){
+    c.strokeStyle='rgba(255,209,102,.95)'; c.lineWidth=3.4; c.beginPath(); c.arc(x,y,r+4,0,Math.PI*2); c.stroke();
+  }
+  c.fillStyle='rgba(255,255,255,.43)'; c.beginPath(); c.arc(x-r*.34,y-r*.36,r*.23,0,Math.PI*2); c.fill();
+  if(seg.head){
+    const ang=seg.angle||-Math.PI;
+    const fx=Math.cos(ang), fy=Math.sin(ang);
+    const sx=-Math.sin(ang), sy=Math.cos(ang);
+    c.fillStyle='#16020a';
+    c.beginPath();
+    c.arc(x+fx*r*.28+sx*r*.34,y+fy*r*.28+sy*r*.34,3.2,0,Math.PI*2);
+    c.arc(x+fx*r*.28-sx*r*.34,y+fy*r*.28-sy*r*.34,3.2,0,Math.PI*2);
+    c.fill();
+    c.strokeStyle='rgba(255,255,255,.22)'; c.lineWidth=1;
+    c.beginPath();
+    c.arc(x-fx*r*.05,y-fy*r*.05,r*.35,ang+.55,ang+Math.PI-.55);
+    c.stroke();
+  }
+  if(seg.letter){
+    c.fillStyle='#fff7e8'; c.strokeStyle='rgba(86,0,28,.72)'; c.lineWidth=4.5;
+    c.font=`900 ${Math.round(r*1.08)}px Nunito`; c.textAlign='center'; c.textBaseline='middle';
+    c.strokeText(seg.letter,x,y+1); c.fillText(seg.letter,x,y+1);
+  }
+  c.restore();
+}
+
+function drawWarrior(){
+  if(state!=='game') return;
+  const x=W/2, y=warriorY(), s=Math.min(1.08,W/390);
+  c.save();
+  c.shadowColor='rgba(255,209,102,.52)'; c.shadowBlur=18;
+  c.strokeStyle='#1c0b29'; c.lineWidth=8*s; c.lineCap='round';
+  c.beginPath(); c.moveTo(x-9*s,y+28*s); c.lineTo(x-27*s,y+54*s); c.moveTo(x+9*s,y+28*s); c.lineTo(x+27*s,y+54*s); c.stroke();
+  const armor=c.createLinearGradient(x-24*s,y-20*s,x+24*s,y+38*s); armor.addColorStop(0,'#91ffe8'); armor.addColorStop(1,'#2d6cdf');
+  c.fillStyle=armor; c.beginPath(); c.roundRect(x-25*s,y-22*s,50*s,62*s,18*s); c.fill();
+  c.strokeStyle='rgba(255,255,255,.38)'; c.lineWidth=2*s; c.stroke();
+  c.fillStyle='#ffd2a6'; c.beginPath(); c.arc(x,y-43*s,18*s,0,Math.PI*2); c.fill();
+  c.fillStyle='#3b1538'; c.beginPath(); c.arc(x,y-51*s,20*s,Math.PI,Math.PI*2); c.fill();
+  c.fillStyle='#180615'; c.beginPath(); c.arc(x-6*s,y-45*s,2.5*s,0,Math.PI*2); c.arc(x+6*s,y-45*s,2.5*s,0,Math.PI*2); c.fill();
+  c.strokeStyle='#ffd166'; c.lineWidth=4*s; c.beginPath(); c.arc(x-31*s,y-15*s,34*s,-Math.PI*.58,Math.PI*.58); c.stroke();
+  c.strokeStyle='#fff2b0'; c.lineWidth=1.6*s; c.beginPath(); c.moveTo(x-21*s,y-45*s); c.lineTo(x-21*s,y+16*s); c.stroke();
+  if(attack){
+    c.strokeStyle='#ffd2a6'; c.lineWidth=7*s; c.beginPath(); c.moveTo(x-9*s,y-12*s); c.lineTo(x-35*s,y-20*s); c.stroke();
+  }
+  c.restore();
+}
+
+function drawArrows(){
+  for(const a of arrows){
+    const target=a.target || {x:a.x,y:a.y-1};
+    const ang=Math.atan2(target.y-a.y,target.x-a.x);
+    c.save(); c.translate(a.x,a.y); c.rotate(ang);
+    c.strokeStyle='#fff4b8'; c.lineWidth=4; c.lineCap='round';
+    c.beginPath(); c.moveTo(-20,0); c.lineTo(15,0); c.stroke();
+    c.strokeStyle='#ffd166'; c.lineWidth=2; c.beginPath(); c.moveTo(-20,-5); c.lineTo(-13,0); c.lineTo(-20,5); c.stroke();
+    c.fillStyle='#ffd166'; c.beginPath(); c.moveTo(21,0); c.lineTo(7,-7); c.lineTo(9,0); c.lineTo(7,7); c.closePath(); c.fill();
+    c.restore();
+  }
+}
+
+function updateFx(dt){
+  for(const p of particles){p.life-=dt*1.75; p.x+=p.vx; p.y+=p.vy; p.vy+=.08;}
+  particles=particles.filter(p=>p.life>0);
+  for(const o of popTexts){o.life-=dt*1.55; o.y-=dt*48;}
+  popTexts=popTexts.filter(o=>o.life>0);
+}
+function drawFx(){
+  for(const p of particles){
+    c.globalAlpha=Math.max(0,p.life); c.fillStyle=p.color; c.beginPath(); c.arc(p.x,p.y,Math.max(.1,p.r*p.life),0,Math.PI*2); c.fill(); c.globalAlpha=1;
+  }
+  for(const o of popTexts){
+    c.globalAlpha=Math.max(0,o.life); c.fillStyle='#fff'; c.strokeStyle='#ff4054'; c.lineWidth=5; c.font='900 30px Nunito'; c.textAlign='left'; c.textBaseline='middle'; c.strokeText(o.txt,o.x,o.y); c.fillText(o.txt,o.x,o.y); c.globalAlpha=1;
+  }
+}
+
+function render(dt){
+  drawBackground(time);
+  c.clearRect(0,0,W,H);
+  if(state==='game') updateGame(dt);
+  updateFx(dt);
+  if(shake>0){
+    const mag=shake; shake=Math.max(0,shake-dt*42);
+    c.save(); c.translate((Math.random()-.5)*mag,(Math.random()-.5)*mag);
+    drawSerpent(); drawArrows(); drawFx(); drawWarrior();
+    c.restore();
+  }else{
+    drawSerpent(); drawArrows(); drawFx(); drawWarrior();
+  }
+}
+
+function loop(ts){
+  const dt=Math.min(.033,(ts-last)/1000||.016); last=ts; time+=dt;
+  render(dt);
+  requestAnimationFrame(loop);
+}
+
+input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();fire();}});
+window.addEventListener('pointerdown',()=>Sound.unlock(),{once:true,passive:true});
+window.addEventListener('keydown',()=>Sound.unlock(),{once:true});
+soundBtn.addEventListener('click',e=>{e.stopPropagation(); Sound.unlock(); Sound.toggle();});
+backBtn.addEventListener('click',e=>{e.stopPropagation(); goBackHome();});
+shootBtn.addEventListener('click',fire);
+startBtn.addEventListener('click',startWithPlayer);
+academyCodeInput.addEventListener('input',updateSaveInfo);
+playerNameInput.addEventListener('input',updateSaveInfo);
+playerPinInput.addEventListener('input',updateSaveInfo);
+resetSaveBtn.addEventListener('click',resetCurrentSave);
+document.getElementById('anagramBtn').addEventListener('click',()=>{Sound.play('button'); beginLevel('anagram');});
+document.getElementById('collectNextBtn').addEventListener('click',()=>{Sound.play('button'); if(nextAfterCollect==='study') showStudy(); else showClear(); });
+document.getElementById('nextBtn').addEventListener('click',()=>{Sound.play('button'); level=level>=packs.length?1:level+1;writeSave(level);beginLevel('spell');});
+document.getElementById('retryBtn').addEventListener('click',()=>{Sound.play('button'); beginLevel(phase);});
+document.getElementById('homeBtn').addEventListener('click',()=>{Sound.play('button'); clearStage();state='home';showScreen('home');updateSaveInfo();});
+
+resize();
+loadLastPlayerToHome();
+Sound.setMode('home');
+requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
