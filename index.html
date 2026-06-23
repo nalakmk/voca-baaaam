@@ -2,14 +2,22 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>VOCA BAAAAM! v12 Firestore</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=overlays-content" />
+<title>VOCA BAAAAM! v5 Fixed Viewport</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap');
-:root{--gold:#ffd166;--mint:#85ffe8;--cyan:#39e7ff;--red:#ff4054;--purple:#2b1039;--safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px)}
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#05020b;color:#fff;font-family:Nunito,system-ui,sans-serif;user-select:none}button,input{font-family:inherit}#app{position:relative;width:100vw;height:100dvh;overflow:hidden;background:#090414}canvas{position:absolute;inset:0;width:100%;height:100%;display:block}.screen{position:absolute;inset:0;z-index:40;display:none;align-items:center;justify-content:center;padding:calc(18px + var(--safe-top)) 18px calc(18px + var(--safe-bottom));background:rgba(5,2,11,.76);backdrop-filter:blur(7px)}.screen.active{display:flex}.card{width:min(420px,94vw);border:1px solid rgba(255,255,255,.18);border-radius:30px;background:linear-gradient(180deg,rgba(48,19,70,.96),rgba(14,7,25,.98));box-shadow:0 30px 100px rgba(0,0,0,.68),inset 0 0 50px rgba(255,255,255,.04);text-align:center;padding:28px 22px}.badge{display:inline-flex;font-size:13px;color:#dfffee;border:1px solid rgba(255,255,255,.16);border-radius:999px;background:rgba(255,255,255,.08);padding:8px 13px;margin-bottom:14px}h1{font-size:clamp(44px,15vw,72px);line-height:.82;margin:8px 0 12px;letter-spacing:-2px;text-shadow:0 0 22px rgba(255,64,84,.58),0 7px 0 rgba(0,0,0,.35)}h1 span{color:var(--gold);text-shadow:0 0 24px rgba(255,209,102,.75)}.subtitle{margin:0 auto 22px;color:#f3e8ff;font-size:16px;line-height:1.4;max-width:340px}.btn-main,.btn-sub{border:0;width:100%;font-weight:900;cursor:pointer}.btn-main{font-size:22px;padding:18px 22px;border-radius:21px;color:#160817;background:linear-gradient(180deg,#fff0a5,#ffb627);box-shadow:0 9px 0 #9b5700,0 0 36px rgba(255,209,102,.55)}.btn-main:active{transform:translateY(5px);box-shadow:0 4px 0 #9b5700,0 0 26px rgba(255,209,102,.45)}.btn-sub{margin-top:12px;font-size:17px;padding:15px;border-radius:18px;color:#fff;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15)}.steps{display:grid;gap:9px;margin:18px 0 0;text-align:left}.step{display:flex;gap:10px;align-items:flex-start;padding:12px;border-radius:17px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1)}.step b{color:var(--mint);font-size:15px;white-space:nowrap}.step span{color:#eee0f6;font-size:14px;line-height:1.32}#hud{position:absolute;inset:0;z-index:30;display:none;pointer-events:none}#hud.active{display:block}.topbar{position:absolute;top:calc(10px + var(--safe-top));left:10px;right:10px;display:flex;gap:8px;justify-content:space-between;align-items:flex-start}.pill{background:rgba(11,7,20,.73);border:1px solid rgba(255,255,255,.16);border-radius:18px;padding:10px 12px;backdrop-filter:blur(10px);box-shadow:0 10px 26px rgba(0,0,0,.25)}.pill small{display:block;color:#baffdf;font-size:10px;letter-spacing:1px;opacity:.9}.pill strong{font-size:17px}.phase{color:var(--gold)}#targetBox{position:absolute;left:50%;bottom:calc(12px + var(--safe-bottom));transform:translateX(-50%);width:min(410px,94vw);pointer-events:auto}#goalText{text-align:center;color:#ffe9a6;font-size:15px;margin-bottom:8px;text-shadow:0 0 12px rgba(255,209,102,.45);min-height:22px}#wordInput{width:100%;border:2px solid rgba(255,255,255,.2);outline:none;border-radius:24px;background:rgba(255,255,255,.97);color:#1d1029;text-align:center;font-size:27px;font-weight:900;padding:16px 18px;box-shadow:0 10px 0 rgba(0,0,0,.28),0 0 32px rgba(255,64,84,.2);text-transform:lowercase}#wordInput:focus{border-color:var(--gold);box-shadow:0 10px 0 rgba(0,0,0,.28),0 0 42px rgba(255,209,102,.5)}#wordInput:disabled{opacity:1;color:#1d1029}#wordInput.wrong{animation:wrong .22s;background:#ffe2e7}@keyframes wrong{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}#shootBtn{width:100%;margin-top:10px;border:0;border-radius:20px;padding:14px 18px;font-size:20px;font-weight:900;color:#190713;background:linear-gradient(180deg,#9fffe1,#3ce2ff);box-shadow:0 7px 0 #11738a,0 0 26px rgba(60,226,255,.38);cursor:pointer}#shootBtn:active{transform:translateY(4px);box-shadow:0 3px 0 #11738a,0 0 20px rgba(60,226,255,.32)}#shootBtn:disabled{filter:saturate(.55);opacity:.9}.word-list{list-style:none;padding:0;margin:18px 0 22px;display:grid;gap:8px;max-height:42dvh;overflow:auto}.word-list li{display:flex;justify-content:space-between;gap:10px;align-items:center;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.09);border-radius:16px;padding:12px 14px;text-align:left}.word-list b{color:var(--mint);letter-spacing:1px}.word-list em{font-style:normal;color:#ffe9a6}.modal-title{font-size:36px;line-height:.95;margin:6px 0 10px;color:var(--gold);text-shadow:0 0 18px rgba(255,209,102,.55)}.modal-desc{margin:0;color:#eadff2;font-size:16px;line-height:1.38}.flash{position:absolute;inset:0;z-index:25;background:rgba(255,255,255,.38);opacity:0;pointer-events:none}.flash.on{animation:flash .23s}@keyframes flash{0%{opacity:0}35%{opacity:1}100%{opacity:0}}.tiny{font-size:12px;color:#d8c7e8;margin-top:12px;opacity:.82}
+:root{--gold:#ffd166;--mint:#85ffe8;--cyan:#39e7ff;--red:#ff4054;--purple:#2b1039;--safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px);--keyboard-inset:0px}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#05020b;color:#fff;font-family:Nunito,system-ui,sans-serif;user-select:none}button,input{font-family:inherit}#app{position:relative;width:100vw;height:100dvh;overflow:hidden;background:#090414;overscroll-behavior:none;touch-action:manipulation}canvas{position:absolute;inset:0;width:100%;height:100%;display:block}.screen{position:absolute;inset:0;z-index:40;display:none;align-items:center;justify-content:center;padding:calc(18px + var(--safe-top)) 18px calc(18px + var(--safe-bottom));background:rgba(5,2,11,.76);backdrop-filter:blur(7px)}.screen.active{display:flex}.card{width:min(420px,94vw);border:1px solid rgba(255,255,255,.18);border-radius:30px;background:linear-gradient(180deg,rgba(48,19,70,.96),rgba(14,7,25,.98));box-shadow:0 30px 100px rgba(0,0,0,.68),inset 0 0 50px rgba(255,255,255,.04);text-align:center;padding:28px 22px}.badge{display:inline-flex;font-size:13px;color:#dfffee;border:1px solid rgba(255,255,255,.16);border-radius:999px;background:rgba(255,255,255,.08);padding:8px 13px;margin-bottom:14px}h1{font-size:clamp(44px,15vw,72px);line-height:.82;margin:8px 0 12px;letter-spacing:-2px;text-shadow:0 0 22px rgba(255,64,84,.58),0 7px 0 rgba(0,0,0,.35)}h1 span{color:var(--gold);text-shadow:0 0 24px rgba(255,209,102,.75)}.subtitle{margin:0 auto 22px;color:#f3e8ff;font-size:16px;line-height:1.4;max-width:340px}.btn-main,.btn-sub{border:0;width:100%;font-weight:900;cursor:pointer}.btn-main{font-size:22px;padding:18px 22px;border-radius:21px;color:#160817;background:linear-gradient(180deg,#fff0a5,#ffb627);box-shadow:0 9px 0 #9b5700,0 0 36px rgba(255,209,102,.55)}.btn-main:active{transform:translateY(5px);box-shadow:0 4px 0 #9b5700,0 0 26px rgba(255,209,102,.45)}.btn-sub{margin-top:12px;font-size:17px;padding:15px;border-radius:18px;color:#fff;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15)}.steps{display:grid;gap:9px;margin:18px 0 0;text-align:left}.step{display:flex;gap:10px;align-items:flex-start;padding:12px;border-radius:17px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1)}.step b{color:var(--mint);font-size:15px;white-space:nowrap}.step span{color:#eee0f6;font-size:14px;line-height:1.32}#hud{position:absolute;inset:0;z-index:30;display:none;pointer-events:none}#hud.active{display:block}.topbar{position:absolute;top:calc(10px + var(--safe-top));left:10px;right:10px;display:flex;gap:8px;justify-content:space-between;align-items:flex-start}.pill{background:rgba(11,7,20,.73);border:1px solid rgba(255,255,255,.16);border-radius:18px;padding:10px 12px;backdrop-filter:blur(10px);box-shadow:0 10px 26px rgba(0,0,0,.25)}.pill small{display:block;color:#baffdf;font-size:10px;letter-spacing:1px;opacity:.9}.pill strong{font-size:17px}.phase{color:var(--gold)}#targetBox{position:absolute;left:50%;bottom:calc(12px + var(--safe-bottom) + var(--keyboard-inset));transform:translateX(-50%);width:min(410px,94vw);pointer-events:auto;transition:bottom .16s ease}#goalText{text-align:center;color:#ffe9a6;font-size:15px;margin-bottom:8px;text-shadow:0 0 12px rgba(255,209,102,.45);min-height:22px}#wordInput{width:100%;border:2px solid rgba(255,255,255,.2);outline:none;border-radius:24px;background:rgba(255,255,255,.97);color:#1d1029;text-align:center;font-size:27px;font-weight:900;padding:16px 18px;box-shadow:0 10px 0 rgba(0,0,0,.28),0 0 32px rgba(255,64,84,.2);text-transform:lowercase}#wordInput:focus{border-color:var(--gold);box-shadow:0 10px 0 rgba(0,0,0,.28),0 0 42px rgba(255,209,102,.5)}#wordInput:disabled{opacity:1;color:#1d1029}#wordInput.wrong{animation:wrong .22s;background:#ffe2e7}@keyframes wrong{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}#shootBtn{width:100%;margin-top:10px;border:0;border-radius:20px;padding:14px 18px;font-size:20px;font-weight:900;color:#190713;background:linear-gradient(180deg,#9fffe1,#3ce2ff);box-shadow:0 7px 0 #11738a,0 0 26px rgba(60,226,255,.38);cursor:pointer}#shootBtn:active{transform:translateY(4px);box-shadow:0 3px 0 #11738a,0 0 20px rgba(60,226,255,.32)}#shootBtn:disabled{filter:saturate(.55);opacity:.9}.word-list{list-style:none;padding:0;margin:18px 0 22px;display:grid;gap:8px;max-height:42dvh;overflow:auto}.word-list li{display:flex;justify-content:space-between;gap:10px;align-items:center;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.09);border-radius:16px;padding:12px 14px;text-align:left}.word-list b{color:var(--mint);letter-spacing:1px}.word-list em{font-style:normal;color:#ffe9a6}.modal-title{font-size:36px;line-height:.95;margin:6px 0 10px;color:var(--gold);text-shadow:0 0 18px rgba(255,209,102,.55)}.modal-desc{margin:0;color:#eadff2;font-size:16px;line-height:1.38}.flash{position:absolute;inset:0;z-index:25;background:rgba(255,255,255,.38);opacity:0;pointer-events:none}.flash.on{animation:flash .23s}@keyframes flash{0%{opacity:0}35%{opacity:1}100%{opacity:0}}.tiny{font-size:12px;color:#d8c7e8;margin-top:12px;opacity:.82}
 .btn-main:disabled{filter:grayscale(.55);opacity:.55;box-shadow:none;transform:none;cursor:default}.collect-layout{display:grid;gap:14px;margin:18px 0}.reward-zone,.vault-zone{border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.07);border-radius:22px;padding:13px}.zone-title{font-size:13px;color:#baffdf;letter-spacing:1px;text-align:left;margin:0 0 9px}.reward-chips,.vault-box{display:flex;gap:9px;flex-wrap:wrap;align-items:center;justify-content:center;min-height:58px}.vault-box{border:1px dashed rgba(255,209,102,.45);border-radius:17px;background:rgba(255,209,102,.07);padding:10px}.empty-vault{font-size:14px;color:#f3e8ff;opacity:.72}.word-chip{border:0;border-radius:999px;padding:12px 15px;font-size:17px;font-weight:900;color:#220817;background:linear-gradient(180deg,#fff7c4,#ffd166);box-shadow:0 5px 0 #9b5700,0 0 18px rgba(255,209,102,.32);cursor:pointer}.word-chip:active{transform:translateY(3px);box-shadow:0 2px 0 #9b5700}.word-chip.moved{background:rgba(255,255,255,.12);color:#d9cce8;box-shadow:none;border:1px solid rgba(255,255,255,.14);cursor:default}.word-chip.saved{background:linear-gradient(180deg,#baffdf,#39e7ff);box-shadow:0 5px 0 #11738a;color:#071820}.word-list li.clickable{cursor:pointer}.word-list li.clickable:active{transform:scale(.985);background:rgba(255,209,102,.12)}.profile-form{display:grid;gap:10px;margin:16px 0 12px}.profile-input{width:100%;border:2px solid rgba(255,255,255,.14);outline:none;border-radius:17px;background:rgba(255,255,255,.94);color:#1d1029;font-size:18px;font-weight:900;padding:13px 15px;text-align:center}.profile-input:focus{border-color:var(--gold);box-shadow:0 0 22px rgba(255,209,102,.35)}.save-info{min-height:22px;font-size:13px;color:#baffdf;margin:6px 0 12px;line-height:1.35}.save-info.warn{color:#ffe9a6}.save-info.bad{color:#ffbdc4}.btn-mini{margin-top:10px;border:0;background:transparent;color:#d8c7e8;text-decoration:underline;font-size:13px;font-weight:800;cursor:pointer}.btn-mini:disabled{opacity:.35;cursor:default}.player-tag{position:absolute;top:calc(64px + var(--safe-top));left:10px;right:10px;text-align:left;color:#e9d9ff;font-size:12px;opacity:.88;pointer-events:none}.player-tag b{color:#baffdf}
 .icon-btn{position:absolute;top:calc(76px + var(--safe-top));z-index:80;border:1px solid rgba(255,255,255,.18);background:rgba(11,7,20,.72);color:#fff;border-radius:999px;width:42px;height:42px;font-size:19px;font-weight:900;backdrop-filter:blur(10px);box-shadow:0 8px 24px rgba(0,0,0,.28);cursor:pointer}.icon-btn:active{transform:scale(.94)}.sound-btn{right:12px}.back-btn{left:12px;display:none}.back-btn.show{display:block}
+
+/* v5: 단어 획득 화면은 모바일 화면마다 높이가 달라도 버튼이 보이도록 카드 내부를 스크롤 구조로 고정합니다. */
+#collectScreen{overflow:auto;align-items:center;}
+#collectScreen .card{max-height:calc(100dvh - 28px - var(--safe-top) - var(--safe-bottom));display:flex;flex-direction:column;overflow:hidden;}
+#collectScreen .collect-layout{min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-right:2px;}
+#collectScreen #collectNextBtn{flex:0 0 auto;}
+#collectScreen .reward-chips,#collectScreen .vault-box{max-height:none;}
+@media (max-height:740px){#collectScreen .card{padding:20px 16px}.word-chip{font-size:15px;padding:10px 12px}#collectScreen .modal-title{font-size:30px}#collectScreen .modal-desc{font-size:14px}}
 @media (min-width:700px){#app{width:430px;height:100dvh;margin:0 auto;box-shadow:0 0 0 999px #05020b}body{background:#05020b}}
 </style>
 </head>
@@ -44,7 +52,7 @@
     </div>
     <div id="targetBox">
       <div id="goalText">단어를 입력하고 Enter로 화살 발사!</div>
-      <input id="wordInput" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="type + enter" />
+      <input id="wordInput" autocomplete="off" autocapitalize="none" spellcheck="false" enterkeyhint="go" inputmode="text" placeholder="type + enter" />
       <button id="shootBtn">🏹 SHOOT / ENTER</button>
     </div>
   </div>
@@ -1700,7 +1708,7 @@ async function syncClearToFirestore(data){
       lastPlayedAt:firebase.firestore.FieldValue.serverTimestamp(),
       lastPlayedAtMillis:data.updatedAt||Date.now(),
       gameTitle:'VOCA BAAAAM!',
-      appVersion:'v12-firestore-paid-v3'
+      appVersion:'v12-firestore-paid-v5-fixed-viewport'
     },{merge:true});
     console.log('Firestore 저장 완료',player.academy,player.name,data);
   }catch(err){
@@ -1730,7 +1738,7 @@ async function registerStudentLoginToFirestore(candidate,saveData,hasCloudRecord
       lastPlayedAt:firebase.firestore.FieldValue.serverTimestamp(),
       lastPlayedAtMillis:now,
       gameTitle:'VOCA BAAAAM!',
-      appVersion:'v12-firestore-paid-v3-student-login'
+      appVersion:'v12-firestore-paid-v5-student-login'
     };
     if(!hasCloudRecord){
       payload.firstJoinedAt=firebase.firestore.FieldValue.serverTimestamp();
@@ -1860,7 +1868,9 @@ function resetCurrentSave(){
   updateSaveInfo();
 }
 
-let W=0,H=0,DPR=1;
+const GAME_W=390, GAME_H=844;
+let W=GAME_W,H=GAME_H,DPR=1;
+let DISPLAY_W=GAME_W,DISPLAY_H=GAME_H,SCALE_X=1,SCALE_Y=1;
 let stars=[];
 let pathPoints=[], pathLines=[], pathTotal=0;
 let last=0,time=0;
@@ -1877,13 +1887,52 @@ let transitionLock=false;
 let nextAfterCollect='study';
 
 function resize(){
+  // v5 핵심: 게임 로직은 항상 390 x 844 고정 좌표계에서 계산합니다.
+  // PC 줌, 화면 크기, 모바일 키보드로 canvas 표시 크기가 바뀌어도
+  // 뱀 이동 거리/속도/충돌 판정은 동일하게 유지됩니다.
   DPR=Math.max(1,Math.min(2,window.devicePixelRatio||1));
   const r=app.getBoundingClientRect();
-  W=r.width; H=r.height;
-  [bg,game].forEach(cv=>{cv.width=Math.floor(W*DPR);cv.height=Math.floor(H*DPR);cv.style.width=W+'px';cv.style.height=H+'px';});
-  b.setTransform(DPR,0,0,DPR,0,0); c.setTransform(DPR,0,0,DPR,0,0);
+  DISPLAY_W=Math.max(1,r.width||window.innerWidth||GAME_W);
+  DISPLAY_H=Math.max(1,r.height||window.innerHeight||GAME_H);
+  W=GAME_W; H=GAME_H;
+  SCALE_X=DISPLAY_W/GAME_W;
+  SCALE_Y=DISPLAY_H/GAME_H;
+  [bg,game].forEach(cv=>{
+    cv.width=Math.floor(DISPLAY_W*DPR);
+    cv.height=Math.floor(DISPLAY_H*DPR);
+    cv.style.width=DISPLAY_W+'px';
+    cv.style.height=DISPLAY_H+'px';
+  });
+  b.setTransform(DPR*SCALE_X,0,0,DPR*SCALE_Y,0,0);
+  c.setTransform(DPR*SCALE_X,0,0,DPR*SCALE_Y,0,0);
   createStars(); buildPath(); drawBackground(0);
   if(state==='game' && serpent){layoutSerpent(serpent,true)}
+  updateKeyboardInset();
+}
+
+function updateKeyboardInset(){
+  // 게임 규칙은 바꾸지 않고, 모바일 키보드가 input을 가리는 것만 보정합니다.
+  // visualViewport가 layout viewport보다 작아질 때만 targetBox를 키보드 위로 올립니다.
+  let inset=0;
+  try{
+    const vv=window.visualViewport;
+    if(vv){
+      const layoutH=window.innerHeight||document.documentElement.clientHeight||DISPLAY_H;
+      inset=Math.max(0, layoutH - vv.height - vv.offsetTop);
+      // 과도한 이동을 막고, landscape/브라우저 UI 변화에 의한 오작동을 줄입니다.
+      if(inset<80) inset=0;
+      inset=Math.min(inset, Math.round(layoutH*.48));
+    }
+  }catch(e){ inset=0; }
+  document.documentElement.style.setProperty('--keyboard-inset', Math.round(inset)+'px');
+}
+
+function preventPageZoom(e){
+  // v5: PC 확대/축소는 허용합니다. 게임 로직은 고정 좌표계에서 계산되어
+  // 브라우저 줌이 바뀌어도 뱀의 실제 이동거리와 판정은 바뀌지 않습니다.
+}
+function preventZoomKeys(e){
+  // v5: Ctrl +/-/0 확대·축소도 허용합니다.
 }
 
 function buildPath(){
@@ -1933,6 +1982,12 @@ function pointAtPath(dist){
   return {x:last.d.x+Math.cos(last.ang)*extra, y:last.d.y+Math.sin(last.ang)*extra, angle:last.ang};
 }
 window.addEventListener('resize',resize,{passive:true});
+if(window.visualViewport){
+  window.visualViewport.addEventListener('resize',updateKeyboardInset,{passive:true});
+  window.visualViewport.addEventListener('scroll',updateKeyboardInset,{passive:true});
+}
+input.addEventListener('focus',()=>setTimeout(updateKeyboardInset,60));
+input.addEventListener('blur',()=>setTimeout(updateKeyboardInset,60));
 
 function createStars(){
   stars=[];
@@ -2185,17 +2240,22 @@ function showCollect(nextAction){
   Sound.play('reward');
   state='collect';
   nextAfterCollect=nextAction;
-  document.getElementById('collectTitle').textContent=phase==='spell'?'SPELL 성공!':'ANAGRAM 성공!';
-  document.getElementById('collectDesc').textContent='성공한 단어를 눌러 내 보관함에 넣으세요. 누를 때마다 발음이 나옵니다.';
+  const newWordCount=Math.min(level,MAX_NEW_WORDS);
+  const collectWords=words.slice(0,newWordCount); // v5: 단어장에는 새 단어만 모으고, 복습 단어는 제외합니다.
+  const reviewCount=Math.max(0,words.length-collectWords.length);
+  document.getElementById('collectTitle').textContent=phase==='spell'?'새 단어 획득!':'새 단어 보관!';
+  document.getElementById('collectDesc').textContent=reviewCount>0
+    ? `이번 레벨의 새 단어 ${collectWords.length}개만 보관하세요. 복습 단어 ${reviewCount}개는 단어장에 다시 넣지 않습니다.`
+    : '성공한 새 단어를 눌러 내 보관함에 넣으세요. 누를 때마다 발음이 나옵니다.';
   const reward=document.getElementById('rewardWords');
   const vault=document.getElementById('vaultBox');
   const next=document.getElementById('collectNextBtn');
   reward.innerHTML='';
-  vault.innerHTML='<span class="empty-vault">단어를 클릭해서 보관함으로 옮기기</span>';
+  vault.innerHTML='<span class="empty-vault">새 단어를 클릭해서 보관함으로 옮기기</span>';
   next.disabled=true;
-  next.textContent='단어를 모두 보관하세요';
+  next.textContent='새 단어를 모두 보관하세요';
   let moved=0;
-  words.forEach((w,idx)=>{
+  collectWords.forEach((w,idx)=>{
     const chip=document.createElement('button');
     chip.type='button'; chip.className='word-chip'; chip.textContent=wordLabel(w);
     chip.addEventListener('click',()=>{
@@ -2213,13 +2273,18 @@ function showCollect(nextAction){
       saved.addEventListener('click',()=>{Sound.play('button'); speakWord(w.word);});
       vault.appendChild(saved);
       moved++;
-      if(moved>=words.length){
+      if(moved>=collectWords.length){
         next.disabled=false;
         next.textContent=nextAfterCollect==='study'?'WORD STUDY로 이동':'LEVEL CLEAR 확인';
+        next.scrollIntoView({block:'nearest',behavior:'smooth'});
       }
     });
     reward.appendChild(chip);
   });
+  if(collectWords.length===0){
+    next.disabled=false;
+    next.textContent=nextAfterCollect==='study'?'WORD STUDY로 이동':'LEVEL CLEAR 확인';
+  }
   showScreen('collect');
 }
 
@@ -2496,7 +2561,7 @@ function render(dt){
 }
 
 function loop(ts){
-  const dt=Math.min(.033,(ts-last)/1000||.016); last=ts; time+=dt;
+  const dt=Math.min(.06,(ts-last)/1000||.016); last=ts; time+=dt; // v5: 모바일 프레임 저하 시에도 실제 시간 기준 속도를 최대한 유지
   render(dt);
   requestAnimationFrame(loop);
 }
